@@ -123,6 +123,23 @@ end
 # ╔═╡ 581809a1-6f8b-40d0-9a6e-d943c424be07
 plot_model(model)
 
+# ╔═╡ 3073ceb2-dccb-400e-ae0d-8ff73569cd54
+md"""
+You can also generate a animation if you like.
+"""
+
+# ╔═╡ 2c119e21-afbf-48ae-aebe-fc161c18f344
+anim = @animate for i in 1:120
+	update!(sim)
+   plot_model(model)
+end
+
+# ╔═╡ a685d6e7-88aa-427b-be61-f1e5da15653a
+gif(anim, "anim_fps15.gif", fps = 15)
+
+# ╔═╡ fa502a3f-ced0-4e82-afce-3baf4cacf4c7
+
+
 # ╔═╡ Cell order:
 # ╟─418c95a7-0125-40b6-acb5-e2011ea60df2
 # ╟─6ec492fc-d622-11eb-2bfb-9d24a91685b7
@@ -147,3 +164,7 @@ plot_model(model)
 # ╟─ce973a4d-b612-450a-8dd9-ddcfbec59c65
 # ╟─d87581c9-63ec-4519-8c84-f8442f05e0a8
 # ╠═581809a1-6f8b-40d0-9a6e-d943c424be07
+# ╟─3073ceb2-dccb-400e-ae0d-8ff73569cd54
+# ╠═2c119e21-afbf-48ae-aebe-fc161c18f344
+# ╠═a685d6e7-88aa-427b-be61-f1e5da15653a
+# ╠═fa502a3f-ced0-4e82-afce-3baf4cacf4c7
