@@ -26,6 +26,11 @@ md"""
 ## 1. Import packages
 """
 
+# ╔═╡ 15bc275c-7d15-479c-b644-d588e67cf3f5
+md"""
+Full documentation is available at [https://juliaocean.github.io/PlanktonIndividuals.jl/dev/](https://juliaocean.github.io/PlanktonIndividuals.jl/dev/)
+"""
+
 # ╔═╡ 3c05c373-af76-4d28-979c-e91aaa7321de
 p=dirname(pathof(PlanktonIndividuals));
 
@@ -138,6 +143,72 @@ end
 gif(anim, "anim_fps15.gif", fps = 15)
 
 # ╔═╡ fa502a3f-ced0-4e82-afce-3baf4cacf4c7
+md"""
+## 5. Exercise
+"""
+
+# ╔═╡ af8be494-afdf-4e2e-a1be-b069c3a14f18
+md"""
+1. Add the second species
+2. Run for a longer period
+3. Add diagnostics
+4. ...
+"""
+
+# ╔═╡ 964cb129-9d7c-47bc-945a-7639e80da21f
+md"""
+#### 1. Add the second species
+
+Run the code below with `N_species = 2` to add the second species.
+
+```julia
+model = PlanktonModel(arch, grid; N_species = 2, N_individual = 2^7, max_individuals = 2^7*8)
+```
+
+In this model setup, there're **two** species, each species has `2^7` individuals.
+"""
+
+# ╔═╡ ed092d52-8afb-4c97-a1fe-4e6cbae33420
+md"""
+#### 2. Run for a longer period
+
+In order to run a longer period, you need first to change `ΔT_vel` to tell the model to use the flow fields for more time steps.
+
+For example, if we want to run the model for 1 day:
+
+```julia
+sim = PlanktonSimulation(model, ΔT = 60, nΔT = 60*24, vels=(u=uvels, v=vvels, w=wvels), ΔT_vel=60*60*24)
+```
+
+As you may noticed, there're two ways to update the model for multiple time steps.
+
+The first one is that `nΔT` is set to `1`, and we use a external for loop to update the model. In this way, you are able to generate animations.
+
+The second one is that `nΔT` is set to the number of time steps you want to run (see example above). In this way, you don't need external for loops.
+"""
+
+# ╔═╡ db9910c4-b5a9-44a9-9596-d5003bcb8c24
+md"""
+#### 3. Add diagnostics
+
+Diagnostics is a good way to check if the model is run correctly.
+Diagnoscits in the model include two parts: Eulerian tracers and individuals.
+Diagnostics of individuals are aggregated into gridded fields.
+
+A full list of available diagnostics can be found [here](https://juliaocean.github.io/PlanktonIndividuals.jl/dev/model_run/#Model-Diagnostics)
+
+Below is a example of model diagnostics. In this example, we are interested in photosynthetically active radiation(`:PAR`), ammonia(`:NH4`), nitrate(`:NO3`), dissolved organic carbon(`:DOC`) as well as the distribution of individuals(`:num`), grazing rate(`:graz`), mortality rate(`:mort`), and division rate(`:dvid`).
+
+```julia
+PlanktonDiagnostics(model; tracer=(:PAR, :NH4, :NO3, :DOC),
+                    plankton=(:num, :graz, :mort, :dvid),
+                    frequency = 1)
+```
+
+`frequency` indicates the frequency of diagnostics (in numbers of time steps), diagnose every time step by default.
+"""
+
+# ╔═╡ 9c8ae4fe-b682-4afc-9c76-0ac3a4b7af7b
 
 
 # ╔═╡ Cell order:
@@ -145,6 +216,7 @@ gif(anim, "anim_fps15.gif", fps = 15)
 # ╟─6ec492fc-d622-11eb-2bfb-9d24a91685b7
 # ╟─139108e4-0829-4710-8419-dc05808f173f
 # ╠═153caed2-f735-4508-8e80-f0461a6af88c
+# ╟─15bc275c-7d15-479c-b644-d588e67cf3f5
 # ╠═3c05c373-af76-4d28-979c-e91aaa7321de
 # ╠═b7f4cd3e-78aa-44cd-bb6c-3f41ed9f8a96
 # ╟─37f42666-276f-43bf-b4b4-a245af7edb29
@@ -167,4 +239,9 @@ gif(anim, "anim_fps15.gif", fps = 15)
 # ╟─3073ceb2-dccb-400e-ae0d-8ff73569cd54
 # ╠═2c119e21-afbf-48ae-aebe-fc161c18f344
 # ╠═a685d6e7-88aa-427b-be61-f1e5da15653a
-# ╠═fa502a3f-ced0-4e82-afce-3baf4cacf4c7
+# ╟─fa502a3f-ced0-4e82-afce-3baf4cacf4c7
+# ╟─af8be494-afdf-4e2e-a1be-b069c3a14f18
+# ╟─964cb129-9d7c-47bc-945a-7639e80da21f
+# ╟─ed092d52-8afb-4c97-a1fe-4e6cbae33420
+# ╟─db9910c4-b5a9-44a9-9596-d5003bcb8c24
+# ╠═9c8ae4fe-b682-4afc-9c76-0ac3a4b7af7b
