@@ -200,12 +200,21 @@ A full list of available diagnostics can be found [here](https://juliaocean.gith
 Below is a example of model diagnostics. In this example, we are interested in photosynthetically active radiation(`:PAR`), ammonia(`:NH4`), nitrate(`:NO3`), dissolved organic carbon(`:DOC`) as well as the distribution of individuals(`:num`), grazing rate(`:graz`), mortality rate(`:mort`), and division rate(`:dvid`).
 
 ```julia
-PlanktonDiagnostics(model; tracer=(:PAR, :NH4, :NO3, :DOC),
+diags = PlanktonDiagnostics(model; tracer=(:PAR, :NH4, :NO3, :DOC),
                     plankton=(:num, :graz, :mort, :dvid),
                     frequency = 1)
 ```
 
 `frequency` indicates the frequency of diagnostics (in numbers of time steps), diagnose every time step by default.
+
+Then we need to include this `PlanktonDiagnostics` in `PlanktonSimulation`.
+
+```julia
+sim = PlanktonSimulation(model, ΔT = 60, nΔT = 60*24,
+						 diags = diags,
+						 vels=(u=uvels, v=vvels, w=wvels),
+						 ΔT_vel=60*120)
+```
 """
 
 # ╔═╡ 9c8ae4fe-b682-4afc-9c76-0ac3a4b7af7b
