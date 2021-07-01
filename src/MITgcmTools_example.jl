@@ -15,56 +15,68 @@ end
 
 # ╔═╡ 8cf4d8ca-84eb-11eb-22d2-255ce7237090
 begin
-	using MITgcmTools, PlutoUI, Printf
+	using MITgcmTools, ClimateModels, PlutoUI, Printf
 	exps=verification_experiments()
-	🏁 = "🏁"
-	md"""## Select model configuration:
+	iexp=findall([exps[i].configuration=="tutorial_global_oce_biogeo" for i in 1:length(exps)])[1]
+	myexp=exps[iexp]
 	
-	_Note: this will trigger the `cleanup`, `compile`, `run` sequence below_
-	"""
+	build_path=joinpath(MITgcm_path,"verification",myexp.configuration,"build")
+	run_path=joinpath(myexp.folder,"run")
+	
+	🏁 = "🏁"
 end
 
 # ╔═╡ 6ef93b0e-859f-11eb-1b3b-d76b26d678dc
 begin
-	imgA="https://user-images.githubusercontent.com/20276764/111042787-12377e00-840d-11eb-8ddb-64cc1cfd57fd.png"
-	imgB="https://user-images.githubusercontent.com/20276764/97648227-970b9780-1a2a-11eb-81c4-65ec2c87efc6.png"
-	md"""# run_MITgcm.jl
+	md"""# global ocean biogeochemistry tutorial
 
 	###
 
-	Here we use [MITgcm](https://mitgcm.readthedocs.io/en/latest/?badge=latest) interactively via [MITgcmTools.jl](https://gaelforget.github.io/MITgcmTools.jl/dev/) to generate something like the result shown below. 
-	
-	###
-	
-	This includes compiling and running the model via the simple interface defined in [ClimateModels.jl](https://github.com/gaelforget/ClimateModels.jl).
-	
-	$(Resource(imgA, :width => 240))
-	
-	### 
-	
-	$(Resource(imgB, :width => 120))
+	Here we experiment with [MIT general circulation model (MITgcm)](https://mitgcm.readthedocs.io/en/latest/?badge=latest)'s global ocean biogeochemistry tutorial (`tutorial_global_oce_biogeo`) via the [ClimateModels.jl](https://github.com/gaelforget/ClimateModels.jl) interface as implemented in [MITgcmTools.jl](https://gaelforget.github.io/MITgcmTools.jl/dev/).
 	"""
 end
 
-# ╔═╡ a28f7354-84eb-11eb-1830-1f401bf2db97
-@bind myexp Select([exps[i].configuration for i in 1:length(exps)],default="tutorial_global_oce_biogeo")
-
 # ╔═╡ 7fa8a460-89d4-11eb-19bb-bbacdd32719a
-begin
-	iexp=findall([exps[i].configuration==myexp for i in 1:length(exps)])[1]
-	exps[iexp]	
-end
+md"""## Model Configuration
 
-# ╔═╡ d90039c4-85a1-11eb-0d82-77db4decaa6e
-md"""## Trigger individual operations:
+The model will compile in a subfolder of `MITgcm` :
 
-_Note: letting each operation complete before triggering another one may be best_
+*$build_path*
 
-Selected model configuration : **$myexp**
+And it will run in a temporary folder :
+
+*$run_path*
+
+The model configuration can be summarized as shown below.
+	
 """
 
+# ╔═╡ 1f3096d3-ca68-4a71-9411-fe3b201cf5a9
+myexp
+
+# ╔═╡ d90039c4-85a1-11eb-0d82-77db4decaa6e
+md"""## Workflow Summary
+
+- the `build` method will compile MITgcm (mitgcmuv)
+- the `setup` method will set up the run directory
+- the `launch` method will start the model run
+
+
+_Note : the `clean` method can be called to remove a previous run directory before going back to `setup`, `launch`, etc._ 
+"""
+
+# ╔═╡ 76291182-86d1-11eb-1524-73dc02ca7b64
+@bind do_build Button("Build MITgcm (mitgcmuv)")
+
+# ╔═╡ 848241fe-86d1-11eb-3b30-b94aa0b4431d
+let
+	do_build
+	#build(exps[iexp])
+	🏁
+end
+
 # ╔═╡ 8569269c-859c-11eb-1ab1-2d874dfa741b
-@bind do_cleanup Button("Clean up subfolders")
+@bind do_cleanup Button("Clean up run/ directory")
 
 # ╔═╡ f008ccaa-859c-11eb-1188-114843d333e6
 let
@@ -73,18 +85,8 @@ let
 	🏁
 end
 
-# ╔═╡ 76291182-86d1-11eb-1524-73dc02ca7b64
-@bind do_build Button("Build mitgcmuv")
-
-# ╔═╡ 848241fe-86d1-11eb-3b30-b94aa0b4431d
-let
-	do_build
-	build(exps[iexp])
-	🏁
-end
-
 # ╔═╡ 11b024ac-86d1-11eb-1db9-47a5e41398e3
-@bind do_link Button("Link input files to run/")
+@bind do_link Button("Link files to run/")
 
 # ╔═╡ 31829f08-86d1-11eb-3e26-dfae038b4c01
 let
@@ -94,14 +96,18 @@ let
 end
 
 # ╔═╡ 5d826e4c-859d-11eb-133d-859c3abe3ebe
-@bind do_run Button("Run mitgcmuv in run/")
+@bind do_run Button("Run model in run/")
 
 # ╔═╡ 550d996a-859d-11eb-34bf-717389fbf809
 let
 	do_run
-	MITgcm_launch(exps[iexp])
+	launch(exps[iexp])
 	🏁
 end
+
+# ╔═╡ 3f58906b-4f50-4df6-84dd-56abe4c9a4c3
+md"""## Contents of `run/` directory
+"""
 
 # ╔═╡ a04c1cd6-3b9e-4e69-b986-c863b120bb0b
 begin
@@ -112,15 +118,16 @@ end
 # ╔═╡ Cell order:
 # ╟─6ef93b0e-859f-11eb-1b3b-d76b26d678dc
 # ╟─8cf4d8ca-84eb-11eb-22d2-255ce7237090
-# ╟─a28f7354-84eb-11eb-1830-1f401bf2db97
 # ╟─7fa8a460-89d4-11eb-19bb-bbacdd32719a
+# ╟─1f3096d3-ca68-4a71-9411-fe3b201cf5a9
 # ╟─d90039c4-85a1-11eb-0d82-77db4decaa6e
-# ╟─8569269c-859c-11eb-1ab1-2d874dfa741b
-# ╟─f008ccaa-859c-11eb-1188-114843d333e6
 # ╟─76291182-86d1-11eb-1524-73dc02ca7b64
 # ╟─848241fe-86d1-11eb-3b30-b94aa0b4431d
+# ╟─8569269c-859c-11eb-1ab1-2d874dfa741b
+# ╟─f008ccaa-859c-11eb-1188-114843d333e6
 # ╟─11b024ac-86d1-11eb-1db9-47a5e41398e3
 # ╟─31829f08-86d1-11eb-3e26-dfae038b4c01
 # ╟─5d826e4c-859d-11eb-133d-859c3abe3ebe
 # ╟─550d996a-859d-11eb-34bf-717389fbf809
+# ╟─3f58906b-4f50-4df6-84dd-56abe4c9a4c3
 # ╟─a04c1cd6-3b9e-4e69-b986-c863b120bb0b
