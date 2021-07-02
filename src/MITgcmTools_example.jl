@@ -71,7 +71,7 @@ _Note : the `clean` method can be called to remove a previous run directory befo
 # ╔═╡ 848241fe-86d1-11eb-3b30-b94aa0b4431d
 let
 	do_build
-	#build(exps[iexp])
+	build(myexp,"--allow-skip")
 	🏁
 end
 
@@ -81,7 +81,7 @@ end
 # ╔═╡ f008ccaa-859c-11eb-1188-114843d333e6
 let
 	do_cleanup
-	clean(exps[iexp])
+	clean(myexp)
 	🏁
 end
 
@@ -91,7 +91,7 @@ end
 # ╔═╡ 31829f08-86d1-11eb-3e26-dfae038b4c01
 let
 	do_link
-	setup(exps[iexp])
+	setup(myexp)
 	🏁
 end
 
@@ -101,7 +101,7 @@ end
 # ╔═╡ 550d996a-859d-11eb-34bf-717389fbf809
 let
 	do_run
-	launch(exps[iexp])
+	launch(myexp)
 	🏁
 end
 
