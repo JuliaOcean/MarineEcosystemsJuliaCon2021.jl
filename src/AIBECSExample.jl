@@ -20,7 +20,7 @@ begin
 	Pkg.activate(mktempdir())
 	# Add package specific versions for reproducibility
 	# (This should work in the future unless one of the dependencies broke semver)
-	Pkg.add(name="AIBECS", version="0.9.2")
+	Pkg.add(name="AIBECS", version="0.9.3")
 	Pkg.add(name="Plots", version="1.16.8")
 	Pkg.add(name="PlutoUI", version="0.7.9")
 	Pkg.add(name="OceanBasins", version="0.1.7")
