@@ -67,15 +67,6 @@ html"""
 <h2>Tracer equation</h2>
 """
 
-# ╔═╡ fc00184b-9bcc-4833-9fc8-49ef2efbd3af
-md"""
-The tracer equation we solve the steady-state of is
-
-$$\frac{\partial \boldsymbol{R}}{\partial t} + \mathbf{T} \, \boldsymbol{R} = \frac{\lambda}{h} (R_\mathsf{atm} - \boldsymbol{R}) (\boldsymbol{z} ≤ h) - \boldsymbol{R} / \tau.$$
-
-where now $\boldsymbol{R}$ is a column vector of radiocarbon concentrations and $\mathbf{T}$ is a sparse matrix representing the ocean circulation.
-"""
-
 # ╔═╡ 2b531ea8-87eb-4a63-aabc-e7520f18a893
 md"""
 #### Continuous PDE
@@ -110,6 +101,21 @@ html"""
 <p>The tracer equation given after discretization and reorganization into column vectors, is the "discrete" tracer equation. It is given by</p>
 """
 
+# ╔═╡ fc00184b-9bcc-4833-9fc8-49ef2efbd3af
+md"""
+#### Discrete tracer equation
+
+The tracer equation we solve the steady-state of is
+
+$$\frac{\partial \boldsymbol{R}}{\partial t} + \mathbf{T} \, \boldsymbol{R} = \frac{\lambda}{h} (R_\mathsf{atm} - \boldsymbol{R}) (\boldsymbol{z} ≤ h) - \boldsymbol{R} / \tau.$$
+
+where now $\boldsymbol{R}$ is a column vector of radiocarbon concentrations and $\mathbf{T}$ is a sparse matrix representing the ocean circulation.
+
+**The goal is to solve for the steady state, i.e.,**
+
+$$\frac{\partial \boldsymbol{R}}{\partial t} = 0.$$
+"""
+
 # ╔═╡ ba54f82c-9e6c-409d-86bd-a85cc4609357
 md"""
 ## Simulate radiocarbon age
@@ -133,7 +139,7 @@ Load the circulation grid and matrix. Here I chose the `OCCA` matrix, which was 
 """
 
 # ╔═╡ 35641e0f-537c-476a-86bd-d690d0989736
-grd, T = OCCA.load() ;
+grd, T = OCIM2.load() ;
 
 # ╔═╡ bcc5fa0f-7595-4a21-a057-1cbabf94a049
 md"""
@@ -242,7 +248,7 @@ R₀ = zeros(length(z)) # an initial guess
 
 # ╔═╡ 77d30cef-dc91-4db1-886f-15b4787f1ec7
 md"""
-We generate the steady-state problem (using SciML lingo)"""
+We generate the steady-state problem (following SciML lingo)"""
 
 # ╔═╡ fa03c28c-5c2a-4764-9260-6acd9b5ec5a3
 prob = SteadyStateProblem(F, ∇ₓF, R₀, p) ;
@@ -550,7 +556,7 @@ depth = $(depth_slider)
 """
 
 # ╔═╡ be2300ea-50a6-42b3-bc3b-3e65e01b3203
-plothorizontalslice(C14age, grd; depth, st=:heatmap)
+plothorizontalslice(C14age, grd; depth)
 
 # ╔═╡ 25379449-9118-4d18-8688-1bedccd454b9
 myhorizontalslice(C14age, grd; depth, title="Radiocarbon age at $(depth)m")
@@ -636,13 +642,13 @@ md"""
 # ╔═╡ Cell order:
 # ╟─c91da4d9-a3d1-4c38-aadb-c4548b6cc0e3
 # ╟─41e825fa-43e2-4b33-9e25-98145cb4eb63
-# ╠═d8ac806d-99b8-4a69-a31d-a92711b274af
 # ╟─d2a72eda-685e-4033-acc4-d384f2816e80
+# ╠═d8ac806d-99b8-4a69-a31d-a92711b274af
 # ╟─1d5df523-879e-4398-849e-d4b21003dd12
-# ╟─fc00184b-9bcc-4833-9fc8-49ef2efbd3af
 # ╟─2b531ea8-87eb-4a63-aabc-e7520f18a893
 # ╟─59304232-cf0f-47ec-b993-86afcd2cc227
 # ╟─5473f343-4dd5-4aef-88c9-4287a876d7f9
+# ╟─fc00184b-9bcc-4833-9fc8-49ef2efbd3af
 # ╟─ba54f82c-9e6c-409d-86bd-a85cc4609357
 # ╟─38129859-df5e-4faa-a75c-8304b2bed55b
 # ╠═0a889312-d965-11eb-28e0-a72a1379850a
@@ -679,8 +685,8 @@ md"""
 # ╠═4d57848c-a2e7-4d5a-b848-f3822437da6a
 # ╠═be2300ea-50a6-42b3-bc3b-3e65e01b3203
 # ╠═25379449-9118-4d18-8688-1bedccd454b9
-# ╠═d4521113-4a5c-4154-877f-7228885e0ac2
 # ╟─1d63cee3-0d5d-497d-b019-ce9c8865c4d4
+# ╠═d4521113-4a5c-4154-877f-7228885e0ac2
 # ╠═ebce3a87-1fd8-4f63-a7ac-c97476c15323
 # ╠═66364ec2-d852-4d02-940f-feafd7deb53d
 # ╟─0268bff0-7ccd-404f-8424-78444885fb4a
