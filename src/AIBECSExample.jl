@@ -253,15 +253,21 @@ md"""And we solve it."""
 # ╔═╡ d3074335-0625-402a-b4d3-6ae65c8cd168
 R = solve(prob, CTKAlg()).u # in SciML lingo, the solution array is in `.u`
 
-# ╔═╡ 5ef6f676-ead9-486d-afdd-b145d48e5a24
+# ╔═╡ 8a231ad0-e2a9-423a-b1b0-e600e0e3aac2
 md"""
-Note that in order to get back to the radiocarbon "age", we must compare $R$ to atmospheric values. We do this using the parameters $\tau$ and $R_\mathsf{atm}$, and, while we're at it, we convert it to units of years. (The default unit for time is seconds in AIBECS.)
+Since radiocarbon decays with timescale $\tau$, if $t$ is the radiocarbon age as we follow a water parcel, then
+
+$$R = R_\mathsf{atm} \exp(-t/\tau)$$
+
+Thus, we recover the radiocarbon age $t$ via
+
+$$t = \tau \log(R_\mathsf{atm} / R)$$
 """
 
 # ╔═╡ 59dd2d1e-78e2-431d-ad92-a7368b8e54ce
 C14age = let
 	@unpack τ, Ratm = p
-	@. log(Ratm / R) * τ * u"s" |> u"yr"
+	@. τ * log(Ratm / R) * u"s" |> u"yr"
 end
 
 # ╔═╡ fdc77b5c-5a56-43bc-b304-89f1f064c9a5
@@ -309,9 +315,6 @@ masks = (
 	IND = isindian(latvec(grd), lonvec(grd), OCEANS),
 )
 
-# ╔═╡ e14f6526-c5e3-4c17-896e-2983c030f5e9
-plotverticalmean(sum(k*mask for (k,mask) in enumerate(masks)), grd; title="Ocean basins: $([(k,m) for (k,m) in enumerate(keys(masks))])", color=cgrad(cgrad(:tab10)[1:length(masks)+1], categorical=true), clim=(-0.5,length(masks)+0.5))
-
 # ╔═╡ f7ad9931-1d92-4d08-a0ee-9393dd524f92
 md"""
 ## Extra settings
@@ -338,12 +341,26 @@ md"""
 # ╔═╡ d5a447b4-2d22-4466-b89f-de859ed9f09e
 clim=(0,2500)
 
+# ╔═╡ 22a18398-a6ac-4229-8a52-e984315bb699
+cmap = cgrad(:davos, rev=true)
+
+# ╔═╡ c91b9d30-b8e0-457a-a958-2d5f60451b78
+basin_colors = cgrad(:tableau_colorblind, categorical=true)[[4, 5, 2, 3]]
+
+# ╔═╡ e14f6526-c5e3-4c17-896e-2983c030f5e9
+begin
+	plotverticalmean(sum(k*mask for (k,mask) in enumerate(masks)), grd; title="Ocean basins", color=cgrad(basin_colors, categorical=true), clim=(-0.5,length(masks)+0.5), colorbar=false)
+	annotate!(80, -15, "IND")
+	annotate!(200, 0, "PAC")
+	annotate!(315, 30, "ATL")
+end
+
 # ╔═╡ 9f2ece88-dbc7-495e-9ca5-6518af58caf8
 # repeated plot options are colorbartitle, colormap, extra margin for colorbar title
 plot_options = (;
 	colorbartitle="\nage",  # The new line moves cbar label to avoid overlap but...
 	right_margin=3Plots.mm, # but the moved cbar label needs more space!
-	color=:viridis, 
+	color=cmap, 
 	clim)
 
 # ╔═╡ d4521113-4a5c-4154-877f-7228885e0ac2
@@ -358,7 +375,8 @@ end
 # ╔═╡ 75b087ff-fb90-4a79-b95b-678157f4046e
 function myzonalaverage(x, grd; kwargs...)
 	p = plotzonalaverage(x, grd; plot_options..., yunit=u"km", kwargs...)
-	plotzonalaverage!(p, x, grd; plot_options..., yunit=u"km", st=:contour, levs=0:500:3000, c=:black, clabels=true, kwargs...)
+	#plotzonalaverage!(p, x, grd; plot_options..., yunit=u"km", st=:contourf, levs=0:100:2500, lw=0, clabels=true, kwargs...)
+	plotzonalaverage!(p, x, grd; plot_options..., yunit=u"km", st=:contour, levs=0:500:2500, c=:black, clabels=true, kwargs...)
 	p
 end
 
@@ -370,13 +388,18 @@ plot([myzonalaverage(C14age, grd; mask, title="Zonal average ($m)")
 		for (m,mask) in pairs(masks)]..., layout=(length(masks),1), size=(500,800))
 
 # ╔═╡ ee1d8881-4dce-45d3-95fa-9bb33819ebe9
-plothorizontalaverage(C14age, grd; plot_options..., xlim=clim, lab="", xlab="Horizontally averaged radiocarbon age")
+plothorizontalaverage(C14age, grd; plot_options..., c=1, xlim=clim, lab="", xlab="Horizontally averaged radiocarbon age", lw=3)
 
 # ╔═╡ 98508321-fb4b-4076-9c95-0d38f63303b8
 let
-	p = plot()
-	for (color, (m,mask)) in enumerate(pairs(masks))
-		plothorizontalaverage!(C14age, grd; mask, plot_options..., color, lab="$m", xlim=(0,NaN), xlab="Basin averaged radiocarbon age")
+	p = plot(xlim=clim, xlab="Basin averaged radiocarbon age", legend=:bottomleft)
+	for (icolor, (m,mask)) in enumerate(pairs(masks))
+		plothorizontalaverage!(p, C14age, grd; mask, 
+			plot_options..., 
+			c=basin_colors[icolor+1], 
+			lw=3, 
+			lab="$m", 
+		)
 	end
 	p
 end
@@ -551,8 +574,8 @@ end
 
 # ╔═╡ dd59eee8-2265-4487-a875-a09aca2d9cb0
 function slice_and_profile(click_coordinate)
-	p = plothorizontalslice(C14age, grd; depth, title="Radiocarbon age at $(depth)m", color=:viridis, clim, colorbar=false)
-	plothorizontalslice!(p, C14age, grd; depth, seriestype=:contourf, levels=0:125:2500, clim, color=:viridis, lw=0)
+	p = plothorizontalslice(C14age, grd; depth, title="Radiocarbon age at $(depth)m", color=cmap, clim, colorbar=false)
+	plothorizontalslice!(p, C14age, grd; depth, seriestype=:contourf, levels=0:125:2500, clim, color=cmap, lw=0)
 	plothorizontalslice!(p, C14age, grd; depth, seriestype=:contour, levels=0:250:5000, color=:black, contour_labels=true)
 	# profile
 	if !isnothing(click_coordinate)
@@ -563,7 +586,7 @@ function slice_and_profile(click_coordinate)
 		vline!(p, [lon], lab="", c=:red, linestyle=:dash)
 		hline!(p, [lat], lab="", c=:red, linestyle=:dash)
 		# profile
-		pro = plotdepthprofile(C14age, grd; lonlat=(lon,lat), xlim=(0,3000), yunit=u"km", lab="", xlab="Age")
+		pro = plotdepthprofile(C14age, grd; lonlat=(lon,lat), xlim=(0,3000), yunit=u"km", lab="", xlab="Age", lw=3)
 		hline!(pro, [depth * u"m"], lab="", c=:red, linestyle=:dash)
 	else
 		pro = plothorizontalaverage(C14age, grd, xlim=(0,3000), yunit=u"km", lab="", xlab="Age")
@@ -572,7 +595,7 @@ function slice_and_profile(click_coordinate)
 	ylims!(p, (-90,90))
 	# home-made colorbar
 	crange = range(clim..., length=100)
-	cbar = contourf(crange * u"yr", [0,1], [crange crange]'; color=:viridis, levels=0:125:2500, clim, colorbar=false, yticks=[], xlab="Radiocarbon age", lw=0)
+	cbar = contourf(crange * u"yr", [0,1], [crange crange]'; color=cmap, levels=0:125:2500, clim, colorbar=false, yticks=[], xlab="Radiocarbon age", lw=0)
 	contour!(cbar, crange * u"yr", [0,1], [crange crange]'; color=:black, levels=0:250:5000) 
 	# combine plots
 	p1 = plot(p, cbar, layout=grid(2, 1, heights=(0.925, 0.075)))
@@ -583,7 +606,7 @@ end
 mainplot = @initially [160.0,0.0] @bind x0 plotclicktracker(slice_and_profile(x0); draggable=true)
 
 # ╔═╡ e552da86-a408-4b3f-a0b6-eb9e9702ddc5
-lon, lat = x0 # a tuple of longitude and latitude sliders
+lon, lat = isnothing(x0) ? (180, 0) : x0 # a tuple of longitude and latitude sliders
 
 # ╔═╡ ebce3a87-1fd8-4f63-a7ac-c97476c15323
 let
@@ -596,9 +619,14 @@ let
 end
 
 # ╔═╡ 66364ec2-d852-4d02-940f-feafd7deb53d
-let
-	plotdepthprofile(C14age, grd; lonlat=(lon,lat), title="Radiocarbon age at ($(prettylon(lon)), $(prettylat(lat)))", xlim=(0,NaN), plot_options..., lab="")
-end
+plotdepthprofile(C14age, grd; lonlat=(lon,lat), 
+	title="Radiocarbon age at ($(prettylon(lon)), $(prettylat(lat)))", 
+	c=1, 
+	lw=3,
+	xlim=clim, 
+	plot_options..., 
+	lab=""
+)
 
 # ╔═╡ 1022c705-7bb4-4f6f-a5b7-834d1c9aaaa6
 md"""
@@ -644,7 +672,7 @@ md"""
 # ╠═fa03c28c-5c2a-4764-9260-6acd9b5ec5a3
 # ╟─da45685f-db9b-4c8a-a62b-0bc9cfc04311
 # ╠═d3074335-0625-402a-b4d3-6ae65c8cd168
-# ╟─5ef6f676-ead9-486d-afdd-b145d48e5a24
+# ╟─8a231ad0-e2a9-423a-b1b0-e600e0e3aac2
 # ╠═59dd2d1e-78e2-431d-ad92-a7368b8e54ce
 # ╟─fdc77b5c-5a56-43bc-b304-89f1f064c9a5
 # ╟─5d8b2518-66a5-4ab2-992b-b80b98d1a498
@@ -674,6 +702,8 @@ md"""
 # ╠═c08308c9-eade-4209-b755-2415542e542a
 # ╟─cffb9e34-c2ab-40c2-8006-e1fd934fd066
 # ╠═d5a447b4-2d22-4466-b89f-de859ed9f09e
+# ╠═22a18398-a6ac-4229-8a52-e984315bb699
+# ╠═c91b9d30-b8e0-457a-a958-2d5f60451b78
 # ╠═9f2ece88-dbc7-495e-9ca5-6518af58caf8
 # ╟─cc9fb021-35f9-4183-b992-40d82a5c1d2b
 # ╠═325084cb-b233-4a63-8f8c-7ba32b7e8d43
