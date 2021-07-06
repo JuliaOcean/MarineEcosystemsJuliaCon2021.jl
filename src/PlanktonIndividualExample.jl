@@ -9,9 +9,19 @@ using PlanktonIndividuals, Plots
 
 # ╔═╡ 418c95a7-0125-40b6-acb5-e2011ea60df2
 md"""
-# Vertical 2-Dimensional Example
+# [PlanktonIndividuals.jl](https://github.com/JuliaOcean/PlanktonIndividuals.jl) tutorial
 """
 
+
+# ╔═╡ 2b46fec5-59bf-4d5b-8af6-0bd695ac1821
+md"""
+PlanktonIndividuals.jl is a fast individual-based model written in Julia that runs on both CPU and GPU. 
+
+It simulates the life cycle of ocean phytoplankton cells as Lagrangian particles while nutrients are represented as Eulerian tracers and advected over the gridded domain. 
+
+
+![phytoplankton](https://github.com/JuliaOcean/PlanktonIndividuals.jl/raw/master/docs/src/PI_Quota.jpeg)
+"""
 
 # ╔═╡ 6ec492fc-d622-11eb-2bfb-9d24a91685b7
 md"""
@@ -39,12 +49,14 @@ include(joinpath(p,"../examples/helper_functions.jl"));
 
 # ╔═╡ 37f42666-276f-43bf-b4b4-a245af7edb29
 md"""
-## 2.Grid & Flow Fields
+## 2. Architecture, Grid & Flow Fields
 """
 
 # ╔═╡ 49c16379-d570-4849-bb74-0b7ccedb86a5
 md"""
 First we generate grid information (128 by 128 grid boxes, 1m thick, and 1m wide) and the computational architecture (CPU).
+
+[Speed-ups](https://juliaocean.github.io/PlanktonIndividuals.jl/dev/benchmarks/) on GPU.
 """
 
 # ╔═╡ 6e45867e-e12e-4e44-9795-0a9ee01ecccb
@@ -72,7 +84,9 @@ Next we setup the individual-based model by specifying the architecture, grid, a
 """
 
 # ╔═╡ 467d1cfd-aadc-4e16-86d4-94cabedcd15a
-model = PlanktonModel(arch, grid; N_species = 1, N_individual = 2^7, max_individuals = 2^7*8)
+model = PlanktonModel(arch, grid; N_species = 1, 
+								  N_individual = 2^7, 
+								  max_individuals = 2^7*8)
 
 # ╔═╡ d4dd3b10-8953-42c9-9274-50b201e08a95
 md"""
@@ -80,7 +94,9 @@ Finally we setup the duration of the model simulation and the kind of output we 
 """
 
 # ╔═╡ 5931e9f6-c028-4933-9f63-2c8881221f25
-sim = PlanktonSimulation(model, ΔT = 60, nΔT = 1, vels=(u=uvels, v=vvels, w=wvels), ΔT_vel=60*120)
+sim = PlanktonSimulation(model, ΔT = 60, nΔT = 1, 
+								vels=(u=uvels, v=vvels, w=wvels), 
+								ΔT_vel=60*120)
 
 # ╔═╡ 7c58dd75-c636-4c02-8647-38bae5e8ab6a
 md"""
@@ -138,6 +154,9 @@ anim = @animate for i in 1:120
 	update!(sim)
    plot_model(model)
 end
+
+# ╔═╡ 63b46d92-d915-492a-807b-af99e6e298c0
+gif(anim, "anim_fps15.gif", fps = 15)
 
 # ╔═╡ a685d6e7-88aa-427b-be61-f1e5da15653a
 gif(anim, "anim_fps15.gif", fps = 15)
@@ -217,11 +236,10 @@ sim = PlanktonSimulation(model, ΔT = 60, nΔT = 60*24,
 ```
 """
 
-# ╔═╡ 9c8ae4fe-b682-4afc-9c76-0ac3a4b7af7b
-
-
 # ╔═╡ Cell order:
 # ╟─418c95a7-0125-40b6-acb5-e2011ea60df2
+# ╟─2b46fec5-59bf-4d5b-8af6-0bd695ac1821
+# ╟─63b46d92-d915-492a-807b-af99e6e298c0
 # ╟─6ec492fc-d622-11eb-2bfb-9d24a91685b7
 # ╟─139108e4-0829-4710-8419-dc05808f173f
 # ╠═153caed2-f735-4508-8e80-f0461a6af88c
@@ -253,4 +271,3 @@ sim = PlanktonSimulation(model, ΔT = 60, nΔT = 60*24,
 # ╟─964cb129-9d7c-47bc-945a-7639e80da21f
 # ╟─ed092d52-8afb-4c97-a1fe-4e6cbae33420
 # ╟─db9910c4-b5a9-44a9-9596-d5003bcb8c24
-# ╠═9c8ae4fe-b682-4afc-9c76-0ac3a4b7af7b
