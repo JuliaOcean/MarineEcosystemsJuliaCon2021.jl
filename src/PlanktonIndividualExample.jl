@@ -4,6 +4,17 @@
 using Markdown
 using InteractiveUtils
 
+# ╔═╡ 4231a89b-6f7f-4580-bf06-f09d099042f0
+begin
+	# create temporary environment
+	import Pkg
+	Pkg.activate(mktempdir())
+	# Add package specific versions for reproducibility
+	# (This should work in the future unless one of the dependencies broke semver)
+	Pkg.add(name="PlanktonIndividuals", version="0.3.4")
+	Pkg.add(name="Plots", version="1.16.8")
+end
+
 # ╔═╡ 153caed2-f735-4508-8e80-f0461a6af88c
 using PlanktonIndividuals, Plots
 
@@ -242,6 +253,7 @@ sim = PlanktonSimulation(model, ΔT = 60, nΔT = 60*24,
 # ╟─63b46d92-d915-492a-807b-af99e6e298c0
 # ╟─6ec492fc-d622-11eb-2bfb-9d24a91685b7
 # ╟─139108e4-0829-4710-8419-dc05808f173f
+# ╠═4231a89b-6f7f-4580-bf06-f09d099042f0
 # ╠═153caed2-f735-4508-8e80-f0461a6af88c
 # ╟─15bc275c-7d15-479c-b644-d588e67cf3f5
 # ╠═3c05c373-af76-4d28-979c-e91aaa7321de
