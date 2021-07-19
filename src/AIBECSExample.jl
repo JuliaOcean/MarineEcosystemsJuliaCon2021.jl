@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.14.8
+# v0.15.1
 
 using Markdown
 using InteractiveUtils
@@ -38,13 +38,23 @@ using OceanBasins
 # ╔═╡ 325084cb-b233-4a63-8f8c-7ba32b7e8d43
 using PlutoUI
 
-# ╔═╡ c91da4d9-a3d1-4c38-aadb-c4548b6cc0e3
+# ╔═╡ b0dd2638-2e67-4f29-899a-4dba8d25c960
 md"""
 # [AIBECS.jl](https://github.com/JuliaOcean/AIBECS.jl) tutorial: Radiocarbon age
 
 In this notebook, you will simulate the radiocarbon age in the global ocean in just a few minutes!
+"""
 
-Note that this notebook is heavily inspired from [the radiocarbon tutorial in AIBECS.jl's documentation](https://juliaocean.github.io/AIBECS.jl/stable/tutorials/2_radiocarbon/).
+# ╔═╡ a1638e89-30b4-41e6-ae6c-9b0cd0c92fcd
+md"""
+!!! note "Note 1"
+    This notebook is heavily inspired from [the radiocarbon tutorial in AIBECS.jl's documentation](https://juliaocean.github.io/AIBECS.jl/stable/tutorials/2_radiocarbon/).
+"""
+
+# ╔═╡ 604a6a0b-0fc4-47e4-9dc1-dbb56106852b
+md"""
+!!! note "Note 2"
+    On your first run, the installation of the packages, their precompilation, and the download of the data should take a few minutes. You can expect up to 10-minutes wait on a slow laptop with a slow internet connection... **Please be patient!**
 """
 
 # ╔═╡ 41e825fa-43e2-4b33-9e25-98145cb4eb63
@@ -54,12 +64,19 @@ md"""
 Radiocarbon, ¹⁴C, is produced by cosmic rays hitting ¹⁴N atoms in the lower stratosphere and upper troposphere.
 ¹⁴C then quickly reacts with oxygen to produce ¹⁴CO₂, which eventually enters the ocean through air–sea gas exchange.
 
-![](https://wserv4.esc.cam.ac.uk/pastclimate/wp-content/uploads/2014/09/Radiocarbon-cycle_2-e1410282981969.jpg)
-*image taken from [a "Past Oceans and Climate" blog post by Luke Skinner](https://wserv4.esc.cam.ac.uk/pastclimate/?page_id=19)*
-
 As it travels the oceans, radiocarbon decays (halflife ~5730 yr).
 Deviations of ¹⁴C concentrations away from atmoshperic values serve as a tracer label for the time passed since a water parcel was last in contact with the atmosphere.
+
 We call this mean time the "radiocarbon age", and we are going to calculate it!
+
+![](https://wserv4.esc.cam.ac.uk/pastclimate/wp-content/uploads/2014/09/Radiocarbon-cycle_2-e1410282981969.jpg)
+*image taken from [a "Past Oceans and Climate" blog post by Luke Skinner](https://wserv4.esc.cam.ac.uk/pastclimate/?page_id=19)*
+"""
+
+# ╔═╡ 1d84e220-7bca-489b-83d8-87fe26398435
+md"""
+!!! note "It's a clickable plot!"
+	You can click on the plot above to select a (lat/lon) location!"
 """
 
 # ╔═╡ 1d5df523-879e-4398-849e-d4b21003dd12
@@ -139,11 +156,27 @@ Load the circulation grid and matrix. Here I chose the `OCCA` matrix, which was 
 """
 
 # ╔═╡ 35641e0f-537c-476a-86bd-d690d0989736
-grd, T = OCIM2.load() ;
+grd, T = OCCA.load() ;
+
+# ╔═╡ cb8c4c09-6783-42c1-b114-d2a20dbfa3f7
+md"""
+!!! warn
+    This cell downloads some data on the first run, so it may take a little time. It is also possible that it stumbles and errors. If it happens, just try it run it again!
+"""
 
 # ╔═╡ bcc5fa0f-7595-4a21-a057-1cbabf94a049
 md"""
-Note that you can also test the different OCIM2 matrices using the `version` keyword argument, .g., with `version="KiHIGH_He"` or `version="KvHIGH_He"` for increased isopycnal and vertical diffusivities, respectively)
+!!! note "You can swap circulations!"
+	For example, you can use the Ocean Circulation Inverse Model (OCIM) matrices using 
+	```julia
+	grd, T = OCIM2.load() ;
+	```
+
+	These OCIM2 matrices come in different flavors, whcih you can select with the `version` keyword argument, e.g., with
+    ```julia
+	OCIM2.load(version="KiHIGH_He")
+	```
+	for increased isopycnal diffusivity, or use `version="KvHIGH_He"` for increased vertical diffusivity.
 """
 
 # ╔═╡ d76ec9fb-77f4-4a14-afb2-713cbd03ffab
@@ -218,6 +251,12 @@ p = Params(λ = 50u"m"/10u"yr",
            τ = 5730u"yr"/log(2),
            Ratm = 42.0u"nM")
 
+# ╔═╡ d4c9bb7f-7e92-4b42-af59-d74d7db3298c
+md"""
+!!! note "Note the units!"
+	You can specify different units and AIBECS (thanks to [Unitful.jl](https://github.com/PainterQubits/Unitful.jl)), will do the conversions for you.
+"""
+
 # ╔═╡ fa2265a6-3bf5-4b29-9fcb-271d1215ea62
 md"""
 ##### 5. The "state" function and its Jacobian
@@ -284,6 +323,24 @@ That's it, now let's plot this radiocarbon age!
 # ╔═╡ 5d8b2518-66a5-4ab2-992b-b80b98d1a498
 md"""
 ### Plot it from all angles
+"""
+
+# ╔═╡ c0c6a6b9-407d-4861-bb27-6e150ee3381d
+md"""
+!!! note "These are reactive plots!"
+	You can select the depth (see the slider), move it around to see maps at different depths. 
+"""
+
+# ╔═╡ eddb1866-9242-485a-9971-a0b1043d0eb7
+md"""
+!!! note "Take a different slice!"
+	You can move the cell of the first plot (with the lat/lon selector) and pick a different location (through which the slice above is taken)!
+"""
+
+# ╔═╡ 2dabc2fc-45f6-4454-855d-555f3eacefdf
+md"""
+!!! note "Chose your best profile!"
+	Select the profile location with the (lat/lon)-selector plot...
 """
 
 # ╔═╡ 0268bff0-7ccd-404f-8424-78444885fb4a
@@ -558,13 +615,13 @@ depth = $(depth_slider)
 # ╔═╡ be2300ea-50a6-42b3-bc3b-3e65e01b3203
 plothorizontalslice(C14age, grd; depth)
 
-# ╔═╡ 25379449-9118-4d18-8688-1bedccd454b9
-myhorizontalslice(C14age, grd; depth, title="Radiocarbon age at $(depth)m")
-
 # ╔═╡ 1d63cee3-0d5d-497d-b019-ce9c8865c4d4
 md"""
 depth = $(depth_slider)
 """
+
+# ╔═╡ 25379449-9118-4d18-8688-1bedccd454b9
+myhorizontalslice(C14age, grd; depth, title="Radiocarbon age at $(depth)m")
 
 # ╔═╡ 2dbc5948-3c9e-4a93-9919-702fab2a992d
 function prettylon(lon)
@@ -640,10 +697,13 @@ md"""
 """
 
 # ╔═╡ Cell order:
-# ╟─c91da4d9-a3d1-4c38-aadb-c4548b6cc0e3
+# ╟─b0dd2638-2e67-4f29-899a-4dba8d25c960
+# ╟─a1638e89-30b4-41e6-ae6c-9b0cd0c92fcd
+# ╟─604a6a0b-0fc4-47e4-9dc1-dbb56106852b
 # ╟─41e825fa-43e2-4b33-9e25-98145cb4eb63
 # ╟─d2a72eda-685e-4033-acc4-d384f2816e80
 # ╠═d8ac806d-99b8-4a69-a31d-a92711b274af
+# ╟─1d84e220-7bca-489b-83d8-87fe26398435
 # ╟─1d5df523-879e-4398-849e-d4b21003dd12
 # ╟─2b531ea8-87eb-4a63-aabc-e7520f18a893
 # ╟─59304232-cf0f-47ec-b993-86afcd2cc227
@@ -655,6 +715,7 @@ md"""
 # ╟─56bf3614-092d-4891-b1aa-7b2c5e1ddcbc
 # ╟─4bbffe2c-0520-4e7b-bf38-0857454336ef
 # ╠═35641e0f-537c-476a-86bd-d690d0989736
+# ╟─cb8c4c09-6783-42c1-b114-d2a20dbfa3f7
 # ╟─bcc5fa0f-7595-4a21-a057-1cbabf94a049
 # ╟─d76ec9fb-77f4-4a14-afb2-713cbd03ffab
 # ╠═ba5fb3fa-b9f8-43c3-881c-0dc26c399b70
@@ -670,6 +731,7 @@ md"""
 # ╠═202247cd-7a29-4f24-a5f9-831badce334f
 # ╟─55292329-200f-4cf3-bb1d-e4cff6def15b
 # ╠═e533c789-73e5-4843-b58e-9b00c950aa0b
+# ╟─d4c9bb7f-7e92-4b42-af59-d74d7db3298c
 # ╟─fa2265a6-3bf5-4b29-9fcb-271d1215ea62
 # ╠═9a40e63d-bcb0-47d9-9daa-f98e6b2d90d7
 # ╟─4e82b6b7-abb8-4248-ad92-65e082c2eedc
@@ -684,11 +746,14 @@ md"""
 # ╟─5d8b2518-66a5-4ab2-992b-b80b98d1a498
 # ╠═4d57848c-a2e7-4d5a-b848-f3822437da6a
 # ╠═be2300ea-50a6-42b3-bc3b-3e65e01b3203
-# ╠═25379449-9118-4d18-8688-1bedccd454b9
+# ╟─c0c6a6b9-407d-4861-bb27-6e150ee3381d
 # ╟─1d63cee3-0d5d-497d-b019-ce9c8865c4d4
+# ╠═25379449-9118-4d18-8688-1bedccd454b9
 # ╠═d4521113-4a5c-4154-877f-7228885e0ac2
 # ╠═ebce3a87-1fd8-4f63-a7ac-c97476c15323
+# ╟─eddb1866-9242-485a-9971-a0b1043d0eb7
 # ╠═66364ec2-d852-4d02-940f-feafd7deb53d
+# ╟─2dabc2fc-45f6-4454-855d-555f3eacefdf
 # ╟─0268bff0-7ccd-404f-8424-78444885fb4a
 # ╠═f0d1a772-2b1d-4feb-8d52-b9dbf29b3f45
 # ╠═75b087ff-fb90-4a79-b95b-678157f4046e
