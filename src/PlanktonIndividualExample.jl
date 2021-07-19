@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.15.0
+# v0.15.1
 
 using Markdown
 using InteractiveUtils
@@ -75,43 +75,17 @@ Then we use a stream function (see helper_functions.jl) to generate a simple flo
 
 # ╔═╡ 5f5a05c6-c76d-4f57-848b-73e391abe7dd
 md"""
-## 3. Model Setup
+## 3. Model Setup & Run
 """
 
 # ╔═╡ 097232e8-dbe7-4c0e-8a3e-25638c28a623
 md"""
 Next we setup the individual-based model by specifying the architecture, grid, and plankton community.
+
+Then we setup the time step (60 seconds) and duration (120 time steps) of the model simulation.
+
+Finally we run the model.
 """
-
-# ╔═╡ 467d1cfd-aadc-4e16-86d4-94cabedcd15a
-model = PlanktonModel(arch, grid; N_species = 1, 
-								  N_individual = 2^7, 
-								  max_individuals = 2^7*8)
-
-# ╔═╡ d4dd3b10-8953-42c9-9274-50b201e08a95
-md"""
-Finally we setup the duration of the model simulation and the kind of output we want.
-"""
-
-# ╔═╡ 5931e9f6-c028-4933-9f63-2c8881221f25
-sim = PlanktonSimulation(model, ΔT = 60, nΔT = 1, 
-								vels=(u=uvels, v=vvels, w=wvels), 
-								ΔT_vel=60*120)
-
-# ╔═╡ 7c58dd75-c636-4c02-8647-38bae5e8ab6a
-md"""
-## 4. Model Run
-"""
-
-# ╔═╡ 8aa211b9-cdb8-4504-b859-e768d6f842dd
-md"""
-We run the model for 120 time steps (2 hours) and then plot individuals and nutrients in their final state (stored in model).
-"""
-
-# ╔═╡ c79a07b2-e448-44d8-b0a0-c42b5fc1db89
-for i in 1:120
-    update!(sim)
-end
 
 # ╔═╡ ce973a4d-b612-450a-8dd9-ddcfbec59c65
 md"""
@@ -127,9 +101,11 @@ function plot_model(model::PlanktonModel)
     fl_plot = Plots.contourf(xC, reverse(zC), rotl90(ϕcenters), xlabel="x (m)", ylabel="z (m)", color=:balance, fmt=:png, colorbar=false)
 
     ## a scatter plot embeded in the flow fields
-    px = Array(model.individuals.phytos.sp1.data.x) .* 1 # convert fractional indices to degree
-    pz = Array(model.individuals.phytos.sp1.data.z) .* -1# convert fractional indices to degree
-    Plots.scatter!(fl_plot, px, pz, ms=5, color = :red, legend=:none)
+	for (ispecies, species) in enumerate(model.individuals.phytos)
+        px = Array(species.data.x) .* 1 # convert fractional indices to degree
+        pz = Array(species.data.z) .* -1# convert fractional indices to degree
+        Plots.scatter!(fl_plot, px, pz, ms=5, color = ispecies, legend=:none) 
+    end
 
     ## DOC field
     trac1 = Plots.contourf(xC, reverse(zC), rotl90(Array(model.nutrients.DOC.data)[3:130,3,3:130]), xlabel="x (m)", ylabel="z (m)", clims=(0.5, 1.1), fmt=:png)
@@ -141,8 +117,25 @@ function plot_model(model::PlanktonModel)
     return plt
 end
 
-# ╔═╡ 581809a1-6f8b-40d0-9a6e-d943c424be07
-plot_model(model)
+# ╔═╡ 467d1cfd-aadc-4e16-86d4-94cabedcd15a
+begin
+	model = PlanktonModel(arch, grid; N_species = 1, 
+								  	  N_individual = 2^7, 
+								  	  max_individuals = 2^7*8)
+	
+	sim = PlanktonSimulation(model, ΔT = 60, nΔT = 120, 
+									vels=(u=uvels, v=vvels, w=wvels), 
+									ΔT_vel=60*120)
+	
+	update!(sim)
+	
+	plot_model(model)
+end
+
+# ╔═╡ 7c58dd75-c636-4c02-8647-38bae5e8ab6a
+md"""
+## 4. Animation
+"""
 
 # ╔═╡ 3073ceb2-dccb-400e-ae0d-8ff73569cd54
 md"""
@@ -150,10 +143,20 @@ You can also generate a animation if you like.
 """
 
 # ╔═╡ 2c119e21-afbf-48ae-aebe-fc161c18f344
-anim = @animate for i in 1:120
-	update!(sim)
-   plot_model(model)
+begin
+	model1 = PlanktonModel(arch, grid; N_species = 1, 
+								  	  N_individual = 2^7, 
+								  	  max_individuals = 2^7*8)
+	
+	sim1 = PlanktonSimulation(model1, ΔT = 60, nΔT = 1, 
+									vels=(u=uvels, v=vvels, w=wvels), 
+									ΔT_vel=60*120)
+	anim = @animate for i in 1:120
+		update!(sim1)
+   		plot_model(model1)
+	end
 end
+
 
 # ╔═╡ 63b46d92-d915-492a-807b-af99e6e298c0
 gif(anim, "anim_fps15.gif", fps = 15)
@@ -187,6 +190,16 @@ model = PlanktonModel(arch, grid; N_species = 2, N_individual = 2^7, max_individ
 In this model setup, there're **two** species, each species has `2^7` individuals.
 """
 
+# ╔═╡ f589f097-12f0-4318-b2a9-dbcdc1fbae1a
+md"""
+!!! note "Note"
+	To add the third species or more needs a bit more work, because each species requires its own `phyt_params` set.
+
+In order to run a simulation with `N_species = 3` or more, you need to update the default parameters (listed [here](https://github.com/JuliaOcean/PlanktonIndividuals.jl/blob/9fc1cf12f650be66230f5aeea5cce6691c12f5fa/src/params/param_default.jl#LL25-L28), and [here](https://juliaocean.github.io/PlanktonIndividuals.jl/dev/model_setup/#parameters) is how to update the parameters). 
+
+An `n` elements Array is required for each parameter with `N_species = n`. `n = 2` by default.
+"""
+
 # ╔═╡ ed092d52-8afb-4c97-a1fe-4e6cbae33420
 md"""
 #### 2. Run for a longer period
@@ -201,9 +214,10 @@ sim = PlanktonSimulation(model, ΔT = 60, nΔT = 60*24, vels=(u=uvels, v=vvels, 
 
 As you may noticed, there're two ways to update the model for multiple time steps.
 
-The first one is that `nΔT` is set to `1`, and we use a external for loop to update the model. In this way, you are able to generate animations.
+The first one is that `nΔT` is set to the number of time steps you want to run (see example in **Model Setup & Run**). In this way, you don't need external for loops.
 
-The second one is that `nΔT` is set to the number of time steps you want to run (see example above). In this way, you don't need external for loops.
+The second one is that `nΔT` is set to `1`, and we use a external for loop to update the model. In this way, you are able to generate animations.
+
 """
 
 # ╔═╡ db9910c4-b5a9-44a9-9596-d5003bcb8c24
@@ -244,7 +258,7 @@ Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 
 [compat]
 PlanktonIndividuals = "~0.3.4"
-Plots = "~1.18.0"
+Plots = "~1.19.2"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -303,9 +317,9 @@ version = "0.1.1"
 
 [[CUDA]]
 deps = ["AbstractFFTs", "Adapt", "BFloat16s", "CEnum", "CompilerSupportLibraries_jll", "DataStructures", "ExprTools", "GPUArrays", "GPUCompiler", "LLVM", "LazyArtifacts", "Libdl", "LinearAlgebra", "Logging", "Printf", "Random", "Random123", "RandomNumbers", "Reexport", "Requires", "SparseArrays", "SpecialFunctions", "TimerOutputs"]
-git-tree-sha1 = "3e5a6cf59289a60202a0f63fdded29473544d553"
+git-tree-sha1 = "5e696e37e51b01ae07bd9f700afe6cbd55250bce"
 uuid = "052768ef-5323-5732-b1bb-66c8b64840ba"
-version = "3.3.2"
+version = "3.3.4"
 
 [[CUDAKernels]]
 deps = ["Adapt", "CUDA", "Cassette", "KernelAbstractions", "SpecialFunctions", "StaticArrays"]
@@ -326,15 +340,15 @@ version = "0.3.7"
 
 [[ChainRulesCore]]
 deps = ["Compat", "LinearAlgebra", "SparseArrays"]
-git-tree-sha1 = "dcc25ff085cf548bc8befad5ce048391a7c07d40"
+git-tree-sha1 = "f53ca8d41e4753c41cdafa6ec5f7ce914b34be54"
 uuid = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
-version = "0.10.11"
+version = "0.10.13"
 
 [[ColorSchemes]]
 deps = ["ColorTypes", "Colors", "FixedPointNumbers", "Random", "StaticArrays"]
-git-tree-sha1 = "c8fd01e4b736013bc61b704871d20503b33ea402"
+git-tree-sha1 = "ed268efe58512df8c7e224d2e170afd76dd6a417"
 uuid = "35d6a980-a343-548e-a6ea-1d62b119f2f4"
-version = "3.12.1"
+version = "3.13.0"
 
 [[ColorTypes]]
 deps = ["FixedPointNumbers", "Random"]
@@ -481,21 +495,21 @@ version = "7.0.1"
 
 [[GPUCompiler]]
 deps = ["DataStructures", "ExprTools", "InteractiveUtils", "LLVM", "Libdl", "Logging", "TimerOutputs", "UUIDs"]
-git-tree-sha1 = "03c3fb77362c08c3722bcef8dec488b708a95d52"
+git-tree-sha1 = "e8a09182a4440489e2e3dedff5ad3f6bbe555396"
 uuid = "61eb1bfa-7361-4325-ad38-22787b887f55"
-version = "0.12.4"
+version = "0.12.5"
 
 [[GR]]
 deps = ["Base64", "DelimitedFiles", "GR_jll", "HTTP", "JSON", "Libdl", "LinearAlgebra", "Pkg", "Printf", "Random", "Serialization", "Sockets", "Test", "UUIDs"]
-git-tree-sha1 = "b83e3125048a9c3158cbb7ca423790c7b1b57bea"
+git-tree-sha1 = "9f473cdf6e2eb360c576f9822e7c765dd9d26dbc"
 uuid = "28b8d3ca-fb5f-59d9-8090-bfdbd6d07a71"
-version = "0.57.5"
+version = "0.58.0"
 
 [[GR_jll]]
 deps = ["Artifacts", "Bzip2_jll", "Cairo_jll", "FFMPEG_jll", "Fontconfig_jll", "GLFW_jll", "JLLWrappers", "JpegTurbo_jll", "Libdl", "Libtiff_jll", "Pixman_jll", "Pkg", "Qt5Base_jll", "Zlib_jll", "libpng_jll"]
-git-tree-sha1 = "e14907859a1d3aee73a019e7b3c98e9e7b8b5b3e"
+git-tree-sha1 = "eaf96e05a880f3db5ded5a5a8a7817ecba3c7392"
 uuid = "d2c73de3-f751-5644-a686-071e5b155ba9"
-version = "0.57.3+0"
+version = "0.58.0+0"
 
 [[GeometryBasics]]
 deps = ["EarCut_jll", "IterTools", "LinearAlgebra", "StaticArrays", "StructArrays", "Tables"]
@@ -595,10 +609,16 @@ uuid = "c1c5ebd0-6772-5130-a774-d5fcae4a789d"
 version = "3.100.1+0"
 
 [[LLVM]]
-deps = ["CEnum", "Libdl", "Printf", "Unicode"]
-git-tree-sha1 = "f57ac3fd2045b50d3db081663837ac5b4096947e"
+deps = ["CEnum", "LLVMExtra_jll", "Libdl", "Printf", "Unicode"]
+git-tree-sha1 = "1b7ba36ea7aa6fa2278118951bad114fbb8359f2"
 uuid = "929cbde3-209d-540e-8aea-75f648917ca0"
-version = "3.9.0"
+version = "4.1.0"
+
+[[LLVMExtra_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
+git-tree-sha1 = "b36c0677a0549c7d1dc8719899a4133abbfacf7d"
+uuid = "dad2f222-ce93-54a1-a47d-0025e8a3acab"
+version = "0.0.6+0"
 
 [[LZO_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -766,9 +786,9 @@ uuid = "ca575930-c2e3-43a9-ace4-1e988b2c1908"
 
 [[OffsetArrays]]
 deps = ["Adapt"]
-git-tree-sha1 = "2bf78c5fd7fa56d2bbf1efbadd45c1b8789e6f57"
+git-tree-sha1 = "4f825c6da64aebaa22cc058ecfceed1ab9af1c7e"
 uuid = "6fe1bfb0-de20-5000-8ca7-80f57d26f881"
-version = "1.10.2"
+version = "1.10.3"
 
 [[Ogg_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -841,9 +861,9 @@ version = "1.0.11"
 
 [[Plots]]
 deps = ["Base64", "Contour", "Dates", "FFMPEG", "FixedPointNumbers", "GR", "GeometryBasics", "JSON", "Latexify", "LinearAlgebra", "Measures", "NaNMath", "PlotThemes", "PlotUtils", "Printf", "REPL", "Random", "RecipesBase", "RecipesPipeline", "Reexport", "Requires", "Scratch", "Showoff", "SparseArrays", "Statistics", "StatsBase", "UUIDs"]
-git-tree-sha1 = "9f126950870ef24ce75cdd841f4b7cf34affc6d2"
+git-tree-sha1 = "f3d4d35b8cb87adc844c05c722f505776ac29988"
 uuid = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
-version = "1.18.0"
+version = "1.19.2"
 
 [[Preferences]]
 deps = ["TOML"]
@@ -935,9 +955,9 @@ uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
 
 [[SortingAlgorithms]]
 deps = ["DataStructures"]
-git-tree-sha1 = "2ec1962eba973f383239da22e75218565c390a96"
+git-tree-sha1 = "b3363d7460f7d098ca0912c69b082f75625d7508"
 uuid = "a2af1166-a08f-5f64-846c-94a0d3cef48c"
-version = "1.0.0"
+version = "1.0.1"
 
 [[SparseArrays]]
 deps = ["LinearAlgebra", "Random"]
@@ -951,9 +971,9 @@ version = "1.5.1"
 
 [[StaticArrays]]
 deps = ["LinearAlgebra", "Random", "Statistics"]
-git-tree-sha1 = "896d55218776ab8f23fb7b222a5a4a946d4aafc2"
+git-tree-sha1 = "1b9a0f17ee0adde9e538227de093467348992397"
 uuid = "90137ffa-7385-5640-81b9-e52037218182"
-version = "1.2.5"
+version = "1.2.7"
 
 [[Statistics]]
 deps = ["LinearAlgebra", "SparseArrays"]
@@ -1259,21 +1279,17 @@ version = "0.9.1+5"
 # ╠═bc16d909-f629-42b9-952b-777470b00a52
 # ╟─5f5a05c6-c76d-4f57-848b-73e391abe7dd
 # ╟─097232e8-dbe7-4c0e-8a3e-25638c28a623
-# ╠═467d1cfd-aadc-4e16-86d4-94cabedcd15a
-# ╟─d4dd3b10-8953-42c9-9274-50b201e08a95
-# ╠═5931e9f6-c028-4933-9f63-2c8881221f25
-# ╟─7c58dd75-c636-4c02-8647-38bae5e8ab6a
-# ╟─8aa211b9-cdb8-4504-b859-e768d6f842dd
-# ╠═c79a07b2-e448-44d8-b0a0-c42b5fc1db89
 # ╟─ce973a4d-b612-450a-8dd9-ddcfbec59c65
 # ╟─d87581c9-63ec-4519-8c84-f8442f05e0a8
-# ╠═581809a1-6f8b-40d0-9a6e-d943c424be07
+# ╠═467d1cfd-aadc-4e16-86d4-94cabedcd15a
+# ╟─7c58dd75-c636-4c02-8647-38bae5e8ab6a
 # ╟─3073ceb2-dccb-400e-ae0d-8ff73569cd54
 # ╠═2c119e21-afbf-48ae-aebe-fc161c18f344
 # ╠═a685d6e7-88aa-427b-be61-f1e5da15653a
 # ╟─fa502a3f-ced0-4e82-afce-3baf4cacf4c7
 # ╟─af8be494-afdf-4e2e-a1be-b069c3a14f18
 # ╟─964cb129-9d7c-47bc-945a-7639e80da21f
+# ╟─f589f097-12f0-4318-b2a9-dbcdc1fbae1a
 # ╟─ed092d52-8afb-4c97-a1fe-4e6cbae33420
 # ╟─db9910c4-b5a9-44a9-9596-d5003bcb8c24
 # ╟─00000000-0000-0000-0000-000000000001
