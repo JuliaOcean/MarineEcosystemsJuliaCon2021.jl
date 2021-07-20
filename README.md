@@ -1,4 +1,4 @@
-# [JuliaCon 2021](https://juliacon.org/2021/) Workshop 
+# [JuliaCon 2021](https://juliacon.org/2021/) Workshop
 
 **Title:** Modeling Marine Ecosystems At Multiple Scales Using Julia
 
@@ -20,7 +20,7 @@ Life in the oceans is strongly connected to our climate. In this workshop, you w
 
 ## Description
 
-Packages covered in this workshop will include: 
+Packages covered in this workshop will include:
 
 - [AIBECS.jl](https://github.com/JuliaOcean/AIBECS.jl): global steady-state biogeochemistry and gridded transport models that run fast for long time scales (centuries or even millennia).
 - [PlanktonIndividuals.jl](https://github.com/JuliaOcean/PlanktonIndividuals.jl): local to global agent-based model, particularly suited to study microbial communities, plankton physiology, and nutrient cycles.
@@ -59,22 +59,30 @@ Workshop materials will be made available ahead of time @ https://github.com/Jul
 
 ## Setup instructions
 
-### Run the notebooks on your local machine
 
 To run the notebooks of this workshop on your machine, you need to:
 
-1. **Install Julia v1.6.1** from https://julialang.org/.
+1. **Install Julia** from https://julialang.org/ (latest version is v1.6.2).
 
 1. **Start Julia.**
 
-1. **Add the Pluto package (v0.14.8 or later).**
-    Making sure you get the latest version can easily be done by making sure Pluto is added in a clean temporary environment. If you are unsure, just copy-paste these lines in your Julia REPL:
+1. **Add the Pluto package (v0.15.0 or later).**
+
+    This is as simple as typing
 
     ```julia
-    import Pkg
-    Pkg.activate(mktempdir())
-    Pkg.add("Pluto")
+    ]add Pluto
     ```
+
+    at the REPL. (Typing `]` will switch the REPL into package-manager mode.)
+
+    > *Note*: Make sure you get version 0.15.0 or later.
+    > If you get an older version can easily be done by making sure Pluto is added in a clean temporary environment. If you are unsure, just copy-paste these lines in your Julia REPL:
+    > ```julia
+    > import Pkg
+    > Pkg.activate(mktempdir())
+    > Pkg.add("Pluto")
+    > ```
 
 1. **Use Pluto to run the notebooks.**
     This is as simple as copy-pasting one of the following lines, depending on which notebook you want to run:
@@ -84,6 +92,3 @@ To run the notebooks of this workshop on your machine, you need to:
     Pluto.run(notebook="https://raw.githubusercontent.com/JuliaOcean/MarineEcosystemsJuliaCon2021.jl/main/src/AIBECSExample.jl")
     ```
 
-### Run the notebooks remotely
-
-TBC.
