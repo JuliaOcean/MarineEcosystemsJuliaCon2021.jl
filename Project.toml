@@ -3,6 +3,12 @@ uuid = "ae04bbf0-2c70-42d7-94da-2eb8e09f5880"
 authors = ["gaelforget <gforget@mit.edu> and contributors"]
 version = "0.1.0"
 
+[deps]
+ClimateModels = "f6adb021-9183-4f40-84dc-8cea6f651bb0"
+MITgcmTools = "62725fbc-3a66-4df3-9000-e33e85b3a198"
+PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
+Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+
 [compat]
 julia = "1"
 
