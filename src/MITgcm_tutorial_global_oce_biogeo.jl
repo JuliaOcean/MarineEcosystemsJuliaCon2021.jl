@@ -43,7 +43,7 @@ md"""
 
     Also, [a fortran compiler is required](https://fortran-lang.org/learn/os_setup/install_gfortran) to compile MITgcm. For example, you can follow these [directions to install gfortran](https://fortran-lang.org/learn/os_setup/install_gfortran).
 
-    Aside your local computer, you can try out this notebook in the cloud via [mybinder.org](https://mybinder.org) e.g. using [this link](https://mybinder.org/v2/gh/gaelforget/MarineEcosystemsJuliaCon2021.jl/gf1?urlpath=lab).
+    Aside your local computer, you can try out this notebook in the cloud via [mybinder.org](https://mybinder.org) e.g. using [this link](https://mybinder.org/v2/gh/JuliaOcean/MarineEcosystemsJuliaCon2021.jl/HEAD?urlpath=lab).
 """
 
 # ╔═╡ 7fa8a460-89d4-11eb-19bb-bbacdd32719a
@@ -702,7 +702,7 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 # ╔═╡ Cell order:
 # ╟─6ef93b0e-859f-11eb-1b3b-d76b26d678dc
 # ╟─42a34a31-4b49-4d0e-81a7-6bde2b1f514d
-# ╠═8cf4d8ca-84eb-11eb-22d2-255ce7237090
+# ╟─8cf4d8ca-84eb-11eb-22d2-255ce7237090
 # ╟─7fa8a460-89d4-11eb-19bb-bbacdd32719a
 # ╟─1f3096d3-ca68-4a71-9411-fe3b201cf5a9
 # ╟─d90039c4-85a1-11eb-0d82-77db4decaa6e
