@@ -36,6 +36,14 @@ begin
 	"""
 end
 
+# ╔═╡ 42a34a31-4b49-4d0e-81a7-6bde2b1f514d
+md"""
+!!! warning
+    On your first run, the installation of Julia packages and download of MITgcm source code may take a few minutes. 
+
+    Also, [a fortran compiler is required](https://fortran-lang.org/learn/os_setup/install_gfortran) to compile MITgcm. For example, you can follow [these directions to install gfortran](https://fortran-lang.org/learn/os_setup/install_gfortran).
+"""
+
 # ╔═╡ 7fa8a460-89d4-11eb-19bb-bbacdd32719a
 md"""## Model Configuration
 
@@ -691,6 +699,7 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 
 # ╔═╡ Cell order:
 # ╟─6ef93b0e-859f-11eb-1b3b-d76b26d678dc
+# ╟─42a34a31-4b49-4d0e-81a7-6bde2b1f514d
 # ╟─8cf4d8ca-84eb-11eb-22d2-255ce7237090
 # ╟─7fa8a460-89d4-11eb-19bb-bbacdd32719a
 # ╟─1f3096d3-ca68-4a71-9411-fe3b201cf5a9
