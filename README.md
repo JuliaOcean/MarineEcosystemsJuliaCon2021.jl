@@ -6,9 +6,11 @@
 
 ## Will stream on youtube at 2pm UTC on Sunday 2021/07/25
 
-https://pretalx.com/juliacon2021/talk/FEZW9Q/
+streaming : https://www.youtube.com/watch?v=UCIRrXz2ZS0
 
-<img src="https://user-images.githubusercontent.com/20276764/126787920-fb0fc858-366e-44cb-822b-6ceb8aa814fa.png" width="90%">
+webpage : https://pretalx.com/juliacon2021/talk/FEZW9Q/
+
+time : <img src="https://user-images.githubusercontent.com/20276764/126787920-fb0fc858-366e-44cb-822b-6ceb8aa814fa.png" width="90%">
 
 ## Abstract
 
