@@ -10,7 +10,7 @@ streaming : https://www.youtube.com/watch?v=UCIRrXz2ZS0
 
 webpage : https://pretalx.com/juliacon2021/talk/FEZW9Q/
 
-time : <img src="https://user-images.githubusercontent.com/20276764/126787920-fb0fc858-366e-44cb-822b-6ceb8aa814fa.png" width="90%">
+<img src="https://user-images.githubusercontent.com/20276764/126787920-fb0fc858-366e-44cb-822b-6ceb8aa814fa.png" width="90%">
 
 ## Abstract
 
@@ -42,17 +42,17 @@ The third hour will provide the opportunity for attendees to further explore the
 
 - Introduction of the topics covered, presenters, installation, and workshop roadmap (15 minutes).
 
-- [AIBECS.jl](https://github.com/JuliaOcean/AIBECS.jl): concept, implementation, tutorial workthough (20 minutes + 10' for questions)
+- [AIBECS.jl](https://github.com/JuliaOcean/AIBECS.jl): concept, implementation, tutorial workthough (30 minutes + 10' for questions)
 
-- [PlanktonIndividuals.jl](https://github.com/JuliaOcean/PlanktonIndividuals.jl): concept, implementation, tutorial workthough (20 minutes + 10' for questions)
+- [PlanktonIndividuals.jl](https://github.com/JuliaOcean/PlanktonIndividuals.jl): concept, implementation, tutorial workthough (30 minutes + 10' for questions)
 
-- [IndividualDisplacements.jl](https://github.com/JuliaClimate/IndividualDisplacements.jl): concept, implementation, tutorial workthough (10 minutes + 10' for questions)
+- [IndividualDisplacements.jl](https://github.com/JuliaClimate/IndividualDisplacements.jl): concept, implementation, tutorial workthough (20 minutes + 10' for questions)
 
-- [MITgcmTools.jl](https://github.com/gaelforget/MITgcmTools.jl): concept, implementation, tutorial workthough (10 minutes + 10' for questions)
+- [MITgcmTools.jl](https://github.com/gaelforget/MITgcmTools.jl): concept, implementation, tutorial workthough (20 minutes + 10' for questions)
 
 - 5-minute break
 
-- Breakout rooms for deeper dive in tutorials, exercises, or trying out your own idea with guidance from the presenters (1 hour)
+- Q&A, tutorials, etc wrap-up
 
 Workshop materials will be made available ahead of time @ https://github.com/JuliaOcean/MarineEcosystemsJuliaCon2021.jl
 
