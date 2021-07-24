@@ -4,26 +4,12 @@
 using Markdown
 using InteractiveUtils
 
-# This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
-macro bind(def, element)
-    quote
-        local el = $(esc(element))
-        global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : missing
-        el
-    end
-end
-
-# ╔═╡ 8cf4d8ca-84eb-11eb-22d2-255ce7237090
-begin
+# ╔═╡ f199ba18-ebe7-4d5d-b682-64969ef5ef92
+begin 
 	using MITgcmTools, ClimateModels, PlutoUI, Printf
-	exps=verification_experiments()
-	iexp=findall([exps[i].configuration=="tutorial_global_oce_biogeo" for i in 1:length(exps)])[1]
-	myexp=exps[iexp]
-	
-	build_path=joinpath(MITgcm_path[1],"verification",myexp.configuration,"build")
-	run_path=joinpath(myexp.folder,"run")
-	
 	🏁 = "🏁"
+	md"""#### Selected Julia Packages
+    """
 end
 
 # ╔═╡ 6ef93b0e-859f-11eb-1b3b-d76b26d678dc
@@ -46,6 +32,54 @@ md"""
     Aside your local computer, you can try out this notebook in the cloud via [mybinder.org](https://mybinder.org) e.g. using [this link](https://mybinder.org/v2/gh/JuliaOcean/MarineEcosystemsJuliaCon2021.jl/HEAD?urlpath=lab).
 """
 
+# ╔═╡ d90039c4-85a1-11eb-0d82-77db4decaa6e
+md"""## Workflow Summary
+
+- the `setup` method will set up the run directory
+- the `build` method will compile the model (MITgcm)
+- the `launch` method will run the model (MITgcm)
+
+"""
+
+# ╔═╡ 3f58906b-4f50-4df6-84dd-56abe4c9a4c3
+md"""## Model Output 
+
+(is found in the `run/` directory)
+"""
+
+# ╔═╡ 9d3d6dd1-d2f8-4a87-a89d-0f0752fc22fa
+md"""## Workflow Record
+
+(is found in the `log/` directory)
+"""
+
+# ╔═╡ cab5152e-3c4b-47ab-937a-f084323267c5
+md"""## Modify And Rerun
+"""
+
+# ╔═╡ 1a9237f4-c1b4-49e1-b3a8-ba7a433cc313
+begin
+	#include("MITgcm_tutorial_global_oce_biogeo_part2.jl")
+	lock=false
+end
+
+# ╔═╡ c95673c6-7aea-4ce1-b135-91073749ea4c
+md"""## Appendices"""
+
+# ╔═╡ 8cf4d8ca-84eb-11eb-22d2-255ce7237090
+begin
+	#select model configuration
+	exps=verification_experiments()
+	iexp=findall([exps[i].configuration=="tutorial_global_oce_biogeo" for i in 1:length(exps)])[1]
+	myexp=exps[iexp]
+
+	#paths to build and run directories
+	build_path=joinpath(MITgcm_path[1],"verification",myexp.configuration,"build")
+	run_path=joinpath(myexp.folder,string(exps[iexp].ID),"run")
+	
+	md"""#### Selected Model Configuration"""
+end
+
 # ╔═╡ 7fa8a460-89d4-11eb-19bb-bbacdd32719a
 md"""## Model Configuration
 
@@ -64,65 +98,34 @@ The model configuration can be summarized as shown below.
 # ╔═╡ 1f3096d3-ca68-4a71-9411-fe3b201cf5a9
 myexp
 
-# ╔═╡ d90039c4-85a1-11eb-0d82-77db4decaa6e
-md"""## Workflow Summary
-
-- the `build` method will compile MITgcm (mitgcmuv)
-- the `setup` method will set up the run directory
-- the `launch` method will start the model run
-
-
-_Note : the `clean` method can be called to remove a previous run directory before going back to `setup`, `launch`, etc._ 
-"""
-
-# ╔═╡ 76291182-86d1-11eb-1524-73dc02ca7b64
-@bind do_build Button("Build MITgcm (mitgcmuv)")
+# ╔═╡ 31829f08-86d1-11eb-3e26-dfae038b4c01
+let
+	setup(myexp)
+	"Setup : 🏁"
+end
 
 # ╔═╡ 848241fe-86d1-11eb-3b30-b94aa0b4431d
 let
-	do_build
 	build(myexp,"--allow-skip")
-	🏁
+	"Build : 🏁"
 end
-
-# ╔═╡ 8569269c-859c-11eb-1ab1-2d874dfa741b
-@bind do_cleanup Button("Clean up run/ directory")
-
-# ╔═╡ f008ccaa-859c-11eb-1188-114843d333e6
-let
-	do_cleanup
-	clean(myexp)
-	🏁
-end
-
-# ╔═╡ 11b024ac-86d1-11eb-1db9-47a5e41398e3
-@bind do_link Button("Link files to run/")
-
-# ╔═╡ 31829f08-86d1-11eb-3e26-dfae038b4c01
-let
-	do_link
-	setup(myexp)
-	🏁
-end
-
-# ╔═╡ 5d826e4c-859d-11eb-133d-859c3abe3ebe
-@bind do_run Button("Run model in run/")
 
 # ╔═╡ 550d996a-859d-11eb-34bf-717389fbf809
 let
-	do_run
 	launch(myexp)
-	🏁
+	"Launch : 🏁"
 end
-
-# ╔═╡ 3f58906b-4f50-4df6-84dd-56abe4c9a4c3
-md"""## Contents of `run/` directory
-"""
 
 # ╔═╡ a04c1cd6-3b9e-4e69-b986-c863b120bb0b
 begin
-	rundir=joinpath(exps[iexp].folder,string(exps[iexp].ID),"run")
-	readdir(rundir)
+	lock
+	readdir(run_path)
+end
+
+# ╔═╡ c53396cf-6225-4f17-9d57-613efaf3cd67
+begin
+	lock
+	git_log_show(myexp)
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -135,7 +138,7 @@ Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 
 [compat]
 ClimateModels = "~0.1.9"
-MITgcmTools = "~0.1.22"
+MITgcmTools = "~0.1.23"
 PlutoUI = "~0.7.9"
 """
 
@@ -145,9 +148,9 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 [[AWS]]
 deps = ["Base64", "Compat", "Dates", "GitHub", "HTTP", "IniFile", "JSON", "MbedTLS", "Mocking", "OrderedCollections", "Retry", "Sockets", "URIs", "UUIDs", "XMLDict"]
-git-tree-sha1 = "48bc88d99e759098f44f3080ad5032be6f3ccfd6"
+git-tree-sha1 = "88765c35de693433aaee01e7607d67b47edda13a"
 uuid = "fbe9abb3-538b-5e4e-ba9e-bc94f4f92ebc"
-version = "1.48.0"
+version = "1.53.0"
 
 [[Adapt]]
 deps = ["LinearAlgebra"]
@@ -230,9 +233,9 @@ version = "1.7.0"
 
 [[DataFrames]]
 deps = ["Compat", "DataAPI", "Future", "InvertedIndices", "IteratorInterfaceExtensions", "LinearAlgebra", "Markdown", "Missings", "PooledArrays", "PrettyTables", "Printf", "REPL", "Reexport", "SortingAlgorithms", "Statistics", "TableTraits", "Tables", "Unicode"]
-git-tree-sha1 = "1dadfca11c0e08e03ab15b63aaeda55266754bad"
+git-tree-sha1 = "a19645616f37a2c2c3077a44bc0d3e73e13441d7"
 uuid = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
-version = "1.2.0"
+version = "1.2.1"
 
 [[DataStructures]]
 deps = ["Compat", "InteractiveUtils", "OrderedCollections"]
@@ -254,9 +257,9 @@ deps = ["Mmap"]
 uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 
 [[DiskArrays]]
-git-tree-sha1 = "326cfc817660c1e8b04a7ba769fff723b56288b6"
+git-tree-sha1 = "599dc32bae654fa78056b15fed9b2af36f04ee44"
 uuid = "3c3547ce-8d99-4f5e-a174-61eb10b00ae3"
-version = "0.2.10"
+version = "0.2.11"
 
 [[Distances]]
 deps = ["LinearAlgebra", "Statistics", "StatsAPI"]
@@ -413,9 +416,9 @@ version = "1.9.3+0"
 
 [[MITgcmTools]]
 deps = ["ClimateModels", "DataFrames", "Dates", "MeshArrays", "NetCDF", "OrderedCollections", "Pkg", "Printf", "SparseArrays", "Suppressor", "UUIDs"]
-git-tree-sha1 = "503642f4d814f45250ab9b0d2e0251338f361d0b"
+git-tree-sha1 = "f2d9079dd0d34f7c3135fd91597f79ef6a786a7b"
 uuid = "62725fbc-3a66-4df3-9000-e33e85b3a198"
-version = "0.1.22"
+version = "0.1.23"
 
 [[Markdown]]
 deps = ["Base64"]
@@ -478,9 +481,9 @@ uuid = "ca575930-c2e3-43a9-ace4-1e988b2c1908"
 
 [[OffsetArrays]]
 deps = ["Adapt"]
-git-tree-sha1 = "2bf78c5fd7fa56d2bbf1efbadd45c1b8789e6f57"
+git-tree-sha1 = "4f825c6da64aebaa22cc058ecfceed1ab9af1c7e"
 uuid = "6fe1bfb0-de20-5000-8ca7-80f57d26f881"
-version = "1.10.2"
+version = "1.10.3"
 
 [[OpenSSL_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -558,9 +561,9 @@ uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
 
 [[SentinelArrays]]
 deps = ["Dates", "Random"]
-git-tree-sha1 = "ffae887d0f0222a19c406a11c3831776d1383e3d"
+git-tree-sha1 = "35927c2c11da0a86bcd482464b93dadd09ce420f"
 uuid = "91c51154-3ec4-41a3-a24f-3f23e20d615c"
-version = "1.3.3"
+version = "1.3.5"
 
 [[Serialization]]
 uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
@@ -590,9 +593,9 @@ uuid = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 
 [[StaticArrays]]
 deps = ["LinearAlgebra", "Random", "Statistics"]
-git-tree-sha1 = "a43a7b58a6e7dc933b2fa2e0ca653ccf8bb8fd0e"
+git-tree-sha1 = "1b9a0f17ee0adde9e538227de093467348992397"
 uuid = "90137ffa-7385-5640-81b9-e52037218182"
-version = "1.2.6"
+version = "1.2.7"
 
 [[Statistics]]
 deps = ["LinearAlgebra", "SparseArrays"]
@@ -652,9 +655,9 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 
 [[Unitful]]
 deps = ["ConstructionBase", "Dates", "LinearAlgebra", "Random"]
-git-tree-sha1 = "b3682a0559219355f1e3c8024e9f97adce2d4623"
+git-tree-sha1 = "a981a8ef8714cba2fd9780b22fd7a469e7aaf56d"
 uuid = "1986cc42-f94f-5a68-af5c-568840ba703d"
-version = "1.8.0"
+version = "1.9.0"
 
 [[XML2_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Libiconv_jll", "Pkg", "Zlib_jll"]
@@ -702,19 +705,20 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 # ╔═╡ Cell order:
 # ╟─6ef93b0e-859f-11eb-1b3b-d76b26d678dc
 # ╟─42a34a31-4b49-4d0e-81a7-6bde2b1f514d
-# ╟─8cf4d8ca-84eb-11eb-22d2-255ce7237090
 # ╟─7fa8a460-89d4-11eb-19bb-bbacdd32719a
 # ╟─1f3096d3-ca68-4a71-9411-fe3b201cf5a9
 # ╟─d90039c4-85a1-11eb-0d82-77db4decaa6e
-# ╟─76291182-86d1-11eb-1524-73dc02ca7b64
-# ╟─848241fe-86d1-11eb-3b30-b94aa0b4431d
-# ╟─8569269c-859c-11eb-1ab1-2d874dfa741b
-# ╟─f008ccaa-859c-11eb-1188-114843d333e6
-# ╟─11b024ac-86d1-11eb-1db9-47a5e41398e3
 # ╟─31829f08-86d1-11eb-3e26-dfae038b4c01
-# ╟─5d826e4c-859d-11eb-133d-859c3abe3ebe
+# ╟─848241fe-86d1-11eb-3b30-b94aa0b4431d
 # ╟─550d996a-859d-11eb-34bf-717389fbf809
 # ╟─3f58906b-4f50-4df6-84dd-56abe4c9a4c3
 # ╟─a04c1cd6-3b9e-4e69-b986-c863b120bb0b
+# ╟─9d3d6dd1-d2f8-4a87-a89d-0f0752fc22fa
+# ╟─c53396cf-6225-4f17-9d57-613efaf3cd67
+# ╟─cab5152e-3c4b-47ab-937a-f084323267c5
+# ╟─1a9237f4-c1b4-49e1-b3a8-ba7a433cc313
+# ╟─c95673c6-7aea-4ce1-b135-91073749ea4c
+# ╟─f199ba18-ebe7-4d5d-b682-64969ef5ef92
+# ╟─8cf4d8ca-84eb-11eb-22d2-255ce7237090
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
