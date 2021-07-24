@@ -27,14 +27,14 @@ nml.params[1][Symbol("frequency(1)")]=2592000.0
 write(fil,nml)
 git_log_fil(exps[iexp],fil,"update parameter file : "*split(fil,"/")[end])
 
-# change model run duration 
+# Set up Atmosphere CO2 concentration to pre-industrial level
 #  (e.g. dic_pCO2 = 0.000278 for pre-industrial level
 #   or   dic_pCO2 = 0.00035 for already changed climate)
 
 fil=joinpath(pardir,"data.dic")
 nml=read(fil,MITgcm_namelist())
 nml.params[3][:dic_int1]=1
-nml.params[3][:dic_pCO2]=0.00035
+nml.params[3][:dic_pCO2]=0.000278
 write(fil,nml)
 git_log_fil(exps[iexp],fil,"update parameter file : "*split(fil,"/")[end])
 
