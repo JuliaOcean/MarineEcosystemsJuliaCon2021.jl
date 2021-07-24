@@ -11,6 +11,96 @@ begin
     """
 end
 
+# ╔═╡ 6ef93b0e-859f-11eb-1b3b-d76b26d678dc
+begin
+	md"""# global ocean biogeochemistry tutorial
+
+	###
+
+	Here we experiment with [MIT general circulation model (MITgcm)](https://mitgcm.readthedocs.io/en/latest/?badge=latest)'s global ocean biogeochemistry tutorial (`tutorial_global_oce_biogeo`) via the [ClimateModels.jl](https://github.com/gaelforget/ClimateModels.jl) interface as implemented in [MITgcmTools.jl](https://gaelforget.github.io/MITgcmTools.jl/dev/).
+	"""
+end
+
+# ╔═╡ 9aeaf058-d8c1-4e42-b5a7-8038ebf50d5a
+md"""
+!!! note "Model Documentation"
+
+	The `tutorial_global_oce_biogeo` model configuration is documented @
+
+	<https://mitgcm.readthedocs.io/en/latest/examples/global_oce_biogeo/global_oce_biogeo.html>
+"""
+
+# ╔═╡ 42a34a31-4b49-4d0e-81a7-6bde2b1f514d
+md"""
+!!! warning
+    On your first run, the installation of Julia packages and download of MITgcm source code may take a few minutes. 
+
+    Also, [a fortran compiler is required](https://fortran-lang.org/learn/os_setup/install_gfortran) to compile MITgcm. For example, you can follow these [directions to install gfortran](https://fortran-lang.org/learn/os_setup/install_gfortran).
+
+    Aside your local computer, you can try out this notebook in the cloud via [mybinder.org](https://mybinder.org) e.g. using [this link](https://mybinder.org/v2/gh/JuliaOcean/MarineEcosystemsJuliaCon2021.jl/HEAD?urlpath=lab).
+
+	But the **simplest method may be to use JuliaHub.com** which readily provides gfortran.
+"""
+
+# ╔═╡ 7fa8a460-89d4-11eb-19bb-bbacdd32719a
+md"""## Model Configuration
+
+The model configuration can be summarized like this:	
+"""
+
+# ╔═╡ d90039c4-85a1-11eb-0d82-77db4decaa6e
+md"""## Workflow Summary
+
+- the `setup` method will set up the run directory
+- the `build` method will compile the model (MITgcm)
+- the `launch` method will run the model (MITgcm)
+
+"""
+
+# ╔═╡ 3f58906b-4f50-4df6-84dd-56abe4c9a4c3
+md"""## Model Output 
+
+(is found in the `run/` directory)
+"""
+
+# ╔═╡ 9d3d6dd1-d2f8-4a87-a89d-0f0752fc22fa
+md"""## Workflow Record
+
+(is found in the `log/` directory)
+"""
+
+# ╔═╡ cab5152e-3c4b-47ab-937a-f084323267c5
+md"""## Modify And Rerun
+
+One cell at a time, for each of the three code cells below : 
+
+1) uncomment the function call (e.g. `lock1=rerun1(exps[iexp])`)
+2) run the code cell (i.e. click on the arrow at the bottom right of cell)
+3) wait until the plot has updated (i.e. after model run has finished)
+4) analyze what's happened to the plot and workflow record
+"""
+
+# ╔═╡ 1a9237f4-c1b4-49e1-b3a8-ba7a433cc313
+begin
+	lock1=false
+	#lock1=rerun1(exps[iexp]) #may take O(30sec)
+end
+
+# ╔═╡ 62bac52e-9f0f-4ee7-9da4-307326f74842
+begin
+	lock2=false
+	#lock2=rerun2(exps[iexp]) #may take O(10min)
+end
+
+# ╔═╡ 6f9c2d22-819b-4001-86cd-b33086a34db6
+begin
+	lock3=false
+	#lock3=rerun3(exps[iexp]) #may take O(10min)
+end
+
+# ╔═╡ c95673c6-7aea-4ce1-b135-91073749ea4c
+md"""## Appendices"""
+
 # ╔═╡ 8cf4d8ca-84eb-11eb-22d2-255ce7237090
 begin
 	#select model configuration
@@ -22,57 +112,28 @@ begin
 	build_path=joinpath(MITgcm_path[1],"verification",myexp.configuration,"build")
 	run_path=joinpath(myexp.folder,string(exps[iexp].ID),"run")
 	log_path=joinpath(myexp.folder,string(exps[iexp].ID),"log")
+	par_path=joinpath(myexp.folder,string(exps[iexp].ID),"log","tracked_parameters")
 	
-	#modify and rerun steps
-	include("MITgcm_tutorial_steps.jl")
-
 	md"""#### Model Configuration"""
 end
 
-# ╔═╡ 6ef93b0e-859f-11eb-1b3b-d76b26d678dc
-begin
-	md"""# global ocean biogeochemistry tutorial
+# ╔═╡ 1f3096d3-ca68-4a71-9411-fe3b201cf5a9
+myexp
 
-	###
-
-	Here we experiment with [MIT general circulation model (MITgcm)](https://mitgcm.readthedocs.io/en/latest/?badge=latest)'s global ocean biogeochemistry tutorial (`tutorial_global_oce_biogeo`) via the [ClimateModels.jl](https://github.com/gaelforget/ClimateModels.jl) interface as implemented in [MITgcmTools.jl](https://gaelforget.github.io/MITgcmTools.jl/dev/).
-	"""
-end
-
-# ╔═╡ 42a34a31-4b49-4d0e-81a7-6bde2b1f514d
+# ╔═╡ 8420675b-1a1b-4f3d-bf81-874ce4813a37
 md"""
-!!! warning
-    On your first run, the installation of Julia packages and download of MITgcm source code may take a few minutes. 
-
-    Also, [a fortran compiler is required](https://fortran-lang.org/learn/os_setup/install_gfortran) to compile MITgcm. For example, you can follow these [directions to install gfortran](https://fortran-lang.org/learn/os_setup/install_gfortran).
-
-    Aside your local computer, you can try out this notebook in the cloud via [mybinder.org](https://mybinder.org) e.g. using [this link](https://mybinder.org/v2/gh/JuliaOcean/MarineEcosystemsJuliaCon2021.jl/HEAD?urlpath=lab).
-"""
-
-# ╔═╡ 7fa8a460-89d4-11eb-19bb-bbacdd32719a
-md"""## Model Configuration
 
 The model will compile in a subfolder of `MITgcm` :
 
 *$build_path*
 
-And it will run in a temporary folder :
+It will run in a temporary folder called :
 
 *$run_path*
 
-The model configuration can be summarized as shown below.
-	
-"""
+And the workflow will be recorded in :
 
-# ╔═╡ 1f3096d3-ca68-4a71-9411-fe3b201cf5a9
-myexp
-
-# ╔═╡ d90039c4-85a1-11eb-0d82-77db4decaa6e
-md"""## Workflow Summary
-
-- the `setup` method will set up the run directory
-- the `build` method will compile the model (MITgcm)
-- the `launch` method will run the model (MITgcm)
+*$log_path*
 
 """
 
@@ -94,42 +155,118 @@ let
 	"Launch : 🏁"
 end
 
-# ╔═╡ 3f58906b-4f50-4df6-84dd-56abe4c9a4c3
-md"""## Model Output 
+# ╔═╡ 0d2237c1-c26c-4f5b-86ca-4682a6ab2d8a
+function rerun3(myexp)
+	# Set up Atmosphere CO2 concentration to already changed climate
+	#  (e.g. dic_pCO2 = 0.000278 for pre-industrial level
+	#   or   dic_pCO2 = 0.00035 for already changed climate)
 
-(is found in the `run/` directory)
-"""
+	fil=joinpath(par_path,"data.dic")
+	nml=read(fil,MITgcm_namelist())
+	nml.params[3][:dic_int1]=1
+	nml.params[3][:dic_pCO2]=0.00035
+	write(fil,nml)
+	git_log_fil(myexp,fil,"update parameter file : "*split(fil,"/")[end])
 
-# ╔═╡ 9d3d6dd1-d2f8-4a87-a89d-0f0752fc22fa
-md"""## Workflow Record
+	# rerun model with updated parameters
+	clean(myexp)
+	setup(myexp)
+	launch(myexp)
 
-(is found in the `log/` directory)
-"""
+	# archive output file
+	fil=joinpath(log_path,"output_run3.txt")
+	cp(joinpath(run_path,"output.txt"),fil)
+	git_log_fil(myexp,fil,"output file from run3")
 
-# ╔═╡ cab5152e-3c4b-47ab-937a-f084323267c5
-md"""## Modify And Rerun
-"""
-
-# ╔═╡ 1a9237f4-c1b4-49e1-b3a8-ba7a433cc313
-begin
-	lock1=false
-	#lock1=rerun1(exps[iexp])
+	return true
 end
 
-# ╔═╡ 62bac52e-9f0f-4ee7-9da4-307326f74842
-begin
-	lock2=false
-	#lock2=rerun2(exps[iexp]) #may take O(15min)
+# ╔═╡ a4db0102-33fb-49c3-92f7-66dacb9d4e07
+function rerun2(myexp)
+	# change model run duration 
+	#  (e.g. nTimeSteps = 720 for one 360-day year with 1/2 day time step
+	#    or  nTimeSteps = 2160 for three years)
+
+	fil=joinpath(par_path,"data")
+	nml=read(fil,MITgcm_namelist())
+	nml.params[3][:nTimeSteps] = 2160
+	write(fil,nml)
+	git_log_fil(myexp,fil,"update parameter file : "*split(fil,"/")[end])
+
+	# rerun model with updated parameters
+
+	clean(myexp)
+	setup(myexp)
+	launch(myexp)
+
+	fil=joinpath(log_path,"output_run2.txt")
+	cp(joinpath(run_path,"output.txt"),fil)
+	git_log_fil(myexp,fil,"output file from run2")
+
+	return true
 end
 
-# ╔═╡ 6f9c2d22-819b-4001-86cd-b33086a34db6
-begin
-	lock3=false
-	#lock3=rerun3(exps[iexp]) #may take O(15min)
-end
+# ╔═╡ db8cc4ec-28a6-4121-a1c0-62701aa4e9f8
+function rerun1(myexp)
+	# output files parameters
 
-# ╔═╡ c95673c6-7aea-4ce1-b135-91073749ea4c
-md"""## Appendices"""
+	fil=joinpath(par_path,"data")
+	nml=read(fil,MITgcm_namelist())
+
+	nml.params[1][:useSingleCpuIO]=true
+
+	nml.params[3][:pChkptFreq] = 31104000.0
+	nml.params[3][:chkptFreq]  = 31104000.0
+	nml.params[3][:dumpFreq]   = 31104000.0
+	nml.params[3][:taveFreq]   = 31104000.0
+	nml.params[3][:taveFreq]   = 31104000.0
+	nml.params[3][:monitorFreq]= 86400.0
+
+	write(fil,nml)
+	git_log_fil(myexp,fil,"update parameter file : "*split(fil,"/")[end])
+
+	# output files parameters
+
+	fil=joinpath(par_path,"data.diagnostics")
+	nml=read(fil,MITgcm_namelist())
+	nml.params[1][Symbol("frequency(1)")]=2592000.0
+	write(fil,nml)
+	git_log_fil(myexp,fil,"update parameter file : "*split(fil,"/")[end])
+
+	# Set up Atmosphere CO2 concentration to pre-industrial level
+	#  (e.g. dic_pCO2 = 0.000278 for pre-industrial level
+	#   or   dic_pCO2 = 0.00035 for already changed climate)
+
+	fil=joinpath(par_path,"data.dic")
+	nml=read(fil,MITgcm_namelist())
+	nml.params[3][:dic_int1]=1
+	nml.params[3][:dic_pCO2]=0.000278
+	write(fil,nml)
+	git_log_fil(myexp,fil,"update parameter file : "*split(fil,"/")[end])
+
+	# change model run duration 
+	#  (e.g. nTimeSteps = 720 for one 360-day year with 1/2 day time step
+	#    or  nTimeSteps = 2160 for three years)
+
+	fil=joinpath(par_path,"data")
+	nml=read(fil,MITgcm_namelist())
+	nml.params[3][:nTimeSteps] = 120
+	write(fil,nml)
+	git_log_fil(myexp,fil,"update parameter file : "*split(fil,"/")[end])
+
+	# rerun model with updated parameters
+
+	clean(myexp)
+	setup(myexp)
+	launch(myexp)
+
+	fil=joinpath(log_path,"output_run1.txt")
+	cp(joinpath(run_path,"output.txt"),fil)
+	git_log_fil(myexp,fil,"output file from run1")
+
+	return true
+
+end
 
 # ╔═╡ a8263dde-4cde-4da1-8108-0135af254965
 begin
@@ -141,12 +278,6 @@ end
 begin
 	lock
 	readdir(run_path)
-end
-
-# ╔═╡ c53396cf-6225-4f17-9d57-613efaf3cd67
-begin
-	lock
-	git_log_show(myexp)
 end
 
 # ╔═╡ d5b00c92-efeb-42ed-9cba-6dd7ffdd4fea
@@ -170,6 +301,12 @@ begin
 
 	plot(t,z,xlabel="day",title="mean ocean carbon (D.I.C.)")
 	
+end
+
+# ╔═╡ c53396cf-6225-4f17-9d57-613efaf3cd67
+begin
+	lock
+	git_log_show(myexp)
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -1235,25 +1372,30 @@ version = "0.9.1+5"
 
 # ╔═╡ Cell order:
 # ╟─6ef93b0e-859f-11eb-1b3b-d76b26d678dc
+# ╟─9aeaf058-d8c1-4e42-b5a7-8038ebf50d5a
 # ╟─42a34a31-4b49-4d0e-81a7-6bde2b1f514d
 # ╟─7fa8a460-89d4-11eb-19bb-bbacdd32719a
 # ╟─1f3096d3-ca68-4a71-9411-fe3b201cf5a9
+# ╟─8420675b-1a1b-4f3d-bf81-874ce4813a37
 # ╟─d90039c4-85a1-11eb-0d82-77db4decaa6e
 # ╟─31829f08-86d1-11eb-3e26-dfae038b4c01
 # ╟─848241fe-86d1-11eb-3b30-b94aa0b4431d
 # ╟─550d996a-859d-11eb-34bf-717389fbf809
 # ╟─3f58906b-4f50-4df6-84dd-56abe4c9a4c3
 # ╟─a04c1cd6-3b9e-4e69-b986-c863b120bb0b
+# ╟─d5b00c92-efeb-42ed-9cba-6dd7ffdd4fea
 # ╟─9d3d6dd1-d2f8-4a87-a89d-0f0752fc22fa
 # ╟─c53396cf-6225-4f17-9d57-613efaf3cd67
 # ╟─cab5152e-3c4b-47ab-937a-f084323267c5
 # ╟─1a9237f4-c1b4-49e1-b3a8-ba7a433cc313
 # ╟─62bac52e-9f0f-4ee7-9da4-307326f74842
 # ╟─6f9c2d22-819b-4001-86cd-b33086a34db6
-# ╟─d5b00c92-efeb-42ed-9cba-6dd7ffdd4fea
 # ╟─c95673c6-7aea-4ce1-b135-91073749ea4c
 # ╟─f199ba18-ebe7-4d5d-b682-64969ef5ef92
 # ╟─8cf4d8ca-84eb-11eb-22d2-255ce7237090
+# ╟─0d2237c1-c26c-4f5b-86ca-4682a6ab2d8a
+# ╟─a4db0102-33fb-49c3-92f7-66dacb9d4e07
+# ╟─db8cc4ec-28a6-4121-a1c0-62701aa4e9f8
 # ╟─a8263dde-4cde-4da1-8108-0135af254965
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
