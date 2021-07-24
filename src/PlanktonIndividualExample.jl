@@ -240,13 +240,14 @@ diags = PlanktonDiagnostics(model; tracer=(:PAR, :NH4, :NO3, :DOC),
 
 `frequency` indicates the frequency of diagnostics (in numbers of time steps), diagnose every time step by default.
 
-Then we need to include this `PlanktonDiagnostics` in `PlanktonSimulation`.
+Then we need to include this `PlanktonDiagnostics` in `PlanktonSimulation` and specify the directory to save the diagnostics.
 
 ```julia
 sim = PlanktonSimulation(model, ΔT = 60, nΔT = 60*24,
 						 diags = diags,
 						 vels=(u=uvels, v=vvels, w=wvels),
-						 ΔT_vel=60*120)
+						 ΔT_vel=60*120,
+						 res_dir = "./results")
 ```
 """
 
