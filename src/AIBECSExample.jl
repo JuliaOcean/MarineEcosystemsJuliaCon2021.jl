@@ -77,7 +77,7 @@ md"""
 
 The "real" three-dimensional PDE for $R(x,y,z)$ is
 
-$$\frac{\partial R}{\partial t} + \underbrace{\nabla \cdot \left[ \boldsymbol{u} - \mathbf{K} \cdot \nabla \right] R}_\mathsf{circulation} = \underbrace{ \frac{\lambda}{h} (R_\mathsf{atm} - R) (z ≤ h)}_\mathsf{air–sea exchange} - \underbrace{R / \tau}_\mathsf{decay},$$
+$$\frac{\partial R}{\partial t} + \underbrace{\nabla \cdot \left[ \boldsymbol{u} - \mathbf{K} \cdot \nabla \right] R}_\mathsf{circulation} = \underbrace{ \frac{\lambda}{h} (R_\mathsf{atm} - R) (z ≤ h)}_\mathsf{air–sea~exchange} - \underbrace{R / \tau}_\mathsf{decay},$$
 
 where $\frac{\partial R}{\partial t}$ is the rate of change of $R$ and $\nabla \cdot \left[ \boldsymbol{u} - \mathbf{K} \cdot \nabla \right] R$ is the flux divergence of $R$ due to the ocean circulation, here given by the mean advective currents $\boldsymbol{u}$ and an eddy-diffusivity matrix $\mathbf{K}$. The first term on the right-hand-side represents the air–sea gas exchange with a piston velocity $λ$ over a depth $h$ and $R / \tau$ is the radioactive decay rate, where $\tau$ is the radioactive decay timescale.
 
@@ -676,7 +676,7 @@ myhorizontalslice(C14age, grd; depth, title="Radiocarbon age at $(depth)m")
 
 # ╔═╡ 2dbc5948-3c9e-4a93-9919-702fab2a992d
 function prettylon(lon)
-	lon = round(Int, lon)
+	lon = round(Int, mod(lon + 180, 360) - 180)
 	lon == 0 ? "0°" : lon > 0 ? "$(lon)°E" : "$(-lon)°W"
 end
 
@@ -751,9 +751,9 @@ Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 
 [compat]
-AIBECS = "~0.10.1"
+AIBECS = "~0.10.3"
 OceanBasins = "~0.1.7"
-Plots = "~1.19.2"
+Plots = "~1.19.3"
 PlutoUI = "~0.7.9"
 """
 
@@ -763,9 +763,9 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 [[AIBECS]]
 deps = ["Bijectors", "CodecZlib", "DataDeps", "DataFrames", "Dates", "DiffEqBase", "Distances", "Distributions", "Downloads", "FieldMetadata", "Flatten", "ForwardDiff", "ImageFiltering", "Interpolations", "JLD2", "LinearAlgebra", "MetadataArrays", "NCDatasets", "NearestNeighbors", "OceanGrids", "Printf", "RecipesBase", "Reexport", "Shapefile", "SparseArrays", "StringDistances", "SuiteSparse", "UnPack", "Unitful", "UnitfulRecipes"]
-git-tree-sha1 = "db7f464702dd129329733e19d08e2b4ef6c2388a"
+git-tree-sha1 = "b7d49b4697c28966338b819a5771f70b1da5d068"
 uuid = "ace601d6-714c-11e9-04e5-89b7fad23838"
-version = "0.10.1"
+version = "0.10.3"
 
 [[AbstractFFTs]]
 deps = ["LinearAlgebra"]
@@ -944,9 +944,9 @@ version = "0.7.7"
 
 [[DataFrames]]
 deps = ["Compat", "DataAPI", "Future", "InvertedIndices", "IteratorInterfaceExtensions", "LinearAlgebra", "Markdown", "Missings", "PooledArrays", "PrettyTables", "Printf", "REPL", "Reexport", "SortingAlgorithms", "Statistics", "TableTraits", "Tables", "Unicode"]
-git-tree-sha1 = "1dadfca11c0e08e03ab15b63aaeda55266754bad"
+git-tree-sha1 = "a19645616f37a2c2c3077a44bc0d3e73e13441d7"
 uuid = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
-version = "1.2.0"
+version = "1.2.1"
 
 [[DataStructures]]
 deps = ["Compat", "InteractiveUtils", "OrderedCollections"]
@@ -1239,6 +1239,12 @@ git-tree-sha1 = "098e4d2c533924c921f9f9847274f2ad89e018b8"
 uuid = "83e8ac13-25f8-5344-8a64-a9f2b223428f"
 version = "0.5.0"
 
+[[Inpaintings]]
+deps = ["LinearAlgebra", "Match", "SparseArrays", "SuiteSparse", "Test"]
+git-tree-sha1 = "583dc8ed254875bf07b01939c339a431e3470a99"
+uuid = "a3d749fb-087c-5225-80b3-65fbd02ae0fd"
+version = "0.3.0"
+
 [[IntelOpenMP_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
 git-tree-sha1 = "d979e54b71da82f3a65b62553da4fc3d18c9004c"
@@ -1422,9 +1428,9 @@ uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 
 [[LoopVectorization]]
 deps = ["ArrayInterface", "DocStringExtensions", "IfElse", "LinearAlgebra", "OffsetArrays", "Polyester", "Requires", "SLEEFPirates", "Static", "StrideArraysCore", "ThreadingUtilities", "UnPack", "VectorizationBase"]
-git-tree-sha1 = "0df87659132a077b3f7e9f7fca8c9c59d4965071"
+git-tree-sha1 = "06c91d5495c32bca6b843551a1331c3cd2fb23d0"
 uuid = "bdcacae8-1622-11e9-2a5c-532679323890"
-version = "0.12.52"
+version = "0.12.53"
 
 [[MKL_jll]]
 deps = ["Artifacts", "IntelOpenMP_jll", "JLLWrappers", "LazyArtifacts", "Libdl", "Pkg"]
@@ -1451,6 +1457,11 @@ version = "0.4.0"
 [[Markdown]]
 deps = ["Base64"]
 uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
+
+[[Match]]
+git-tree-sha1 = "5cf525d97caf86d29307150fcba763a64eaa9cbe"
+uuid = "7eb4fadd-790c-5f42-8a69-bfa0b872bfbf"
+version = "1.1.0"
 
 [[MbedTLS]]
 deps = ["Dates", "MbedTLS_jll", "Random", "Sockets"]
@@ -1540,10 +1551,10 @@ uuid = "d1bb7020-b2be-4340-9d18-d24ca645bddb"
 version = "0.1.7"
 
 [[OceanGrids]]
-deps = ["Interpolations", "LinearAlgebra", "NearestNeighbors", "SparseArrays", "Unitful"]
-git-tree-sha1 = "d426b7ff9caab0d1691d59d041ee4c492a0c56d0"
+deps = ["Inpaintings", "Interpolations", "LinearAlgebra", "NearestNeighbors", "SparseArrays", "Unitful"]
+git-tree-sha1 = "1c37d339225a28cf319bfd90bf57822b075da403"
 uuid = "cfe838f4-859f-11e9-2ea1-df7d4e7c3537"
-version = "0.4.0"
+version = "0.4.2"
 
 [[OffsetArrays]]
 deps = ["Adapt"]
@@ -1634,9 +1645,9 @@ version = "1.0.11"
 
 [[Plots]]
 deps = ["Base64", "Contour", "Dates", "FFMPEG", "FixedPointNumbers", "GR", "GeometryBasics", "JSON", "Latexify", "LinearAlgebra", "Measures", "NaNMath", "PlotThemes", "PlotUtils", "Printf", "REPL", "Random", "RecipesBase", "RecipesPipeline", "Reexport", "Requires", "Scratch", "Showoff", "SparseArrays", "Statistics", "StatsBase", "UUIDs"]
-git-tree-sha1 = "f3d4d35b8cb87adc844c05c722f505776ac29988"
+git-tree-sha1 = "1bbbb5670223d48e124b388dee62477480e23234"
 uuid = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
-version = "1.19.2"
+version = "1.19.3"
 
 [[PlutoUI]]
 deps = ["Base64", "Dates", "InteractiveUtils", "JSON", "Logging", "Markdown", "Random", "Reexport", "Suppressor"]
@@ -1646,9 +1657,9 @@ version = "0.7.9"
 
 [[Polyester]]
 deps = ["ArrayInterface", "IfElse", "ManualMemory", "Requires", "Static", "StrideArraysCore", "ThreadingUtilities", "VectorizationBase"]
-git-tree-sha1 = "f5a74523ebc205723baefb95874f708741199d70"
+git-tree-sha1 = "2a5e179a459867e0046d4e74e1a8cfc88a06ee4a"
 uuid = "f517fe37-dbe3-4b94-8317-1923a5111588"
-version = "0.3.4"
+version = "0.3.6"
 
 [[PolygonOps]]
 git-tree-sha1 = "c031d2332c9a8e1c90eca239385815dc271abb22"
@@ -1715,9 +1726,9 @@ version = "0.3.4"
 
 [[RecursiveArrayTools]]
 deps = ["ArrayInterface", "ChainRulesCore", "DocStringExtensions", "LinearAlgebra", "RecipesBase", "Requires", "StaticArrays", "Statistics", "ZygoteRules"]
-git-tree-sha1 = "2a76e8f24c67f3ebecaccefa8d4abd27db828407"
+git-tree-sha1 = "38620897f15246aedbcfd5eb79b7a4baf57a9ace"
 uuid = "731186ca-8d62-57ce-b412-fbd966d074cd"
-version = "2.14.9"
+version = "2.15.1"
 
 [[RecursiveFactorization]]
 deps = ["LinearAlgebra", "LoopVectorization"]
@@ -1759,9 +1770,9 @@ version = "0.6.22"
 
 [[SciMLBase]]
 deps = ["ArrayInterface", "CommonSolve", "ConstructionBase", "Distributed", "DocStringExtensions", "IteratorInterfaceExtensions", "LinearAlgebra", "Logging", "RecipesBase", "RecursiveArrayTools", "StaticArrays", "Statistics", "Tables", "TreeViews"]
-git-tree-sha1 = "932aaae93e81686e6473f27b5a11c403576a2183"
+git-tree-sha1 = "f0bf114650476709dd04e690ab2e36d88368955e"
 uuid = "0bca4576-84f4-4d90-8ffe-ffa030f20462"
-version = "1.18.0"
+version = "1.18.2"
 
 [[Scratch]]
 deps = ["Dates"]
@@ -1958,9 +1969,9 @@ version = "1.4.0"
 
 [[VectorizationBase]]
 deps = ["ArrayInterface", "Hwloc", "IfElse", "Libdl", "LinearAlgebra", "Static"]
-git-tree-sha1 = "b609848b41158b8cc13a72dc6deb9511f9a96187"
+git-tree-sha1 = "ddeac5d8aad03c17bdc8efd45246e82fc52d12f4"
 uuid = "3d5dd08c-fd9d-11e8-17fa-ed2836048c2f"
-version = "0.20.22"
+version = "0.20.24"
 
 [[Wayland_jll]]
 deps = ["Artifacts", "Expat_jll", "JLLWrappers", "Libdl", "Libffi_jll", "Pkg", "XML2_jll"]
@@ -2248,7 +2259,7 @@ version = "0.9.1+5"
 # ╟─1d63cee3-0d5d-497d-b019-ce9c8865c4d4
 # ╟─c0c6a6b9-407d-4861-bb27-6e150ee3381d
 # ╟─a508b27d-4a2d-4453-87e8-c6d330f65b6d
-# ╠═d4521113-4a5c-4154-877f-7228885e0ac2
+# ╟─d4521113-4a5c-4154-877f-7228885e0ac2
 # ╟─b4ac7dc7-6000-40c0-a081-c39bc3d286d9
 # ╠═25379449-9118-4d18-8688-1bedccd454b9
 # ╟─e648c42a-9ebc-46f0-bdff-55d74a284009
@@ -2256,12 +2267,12 @@ version = "0.9.1+5"
 # ╟─ebce3a87-1fd8-4f63-a7ac-c97476c15323
 # ╟─eddb1866-9242-485a-9971-a0b1043d0eb7
 # ╟─d444fc11-9113-41bb-86a8-792feabafe7f
-# ╠═66364ec2-d852-4d02-940f-feafd7deb53d
+# ╟─66364ec2-d852-4d02-940f-feafd7deb53d
 # ╟─2dabc2fc-45f6-4454-855d-555f3eacefdf
 # ╟─488c6914-0a09-475f-870b-6148dc6dadb3
 # ╟─0268bff0-7ccd-404f-8424-78444885fb4a
 # ╠═f0d1a772-2b1d-4feb-8d52-b9dbf29b3f45
-# ╠═75b087ff-fb90-4a79-b95b-678157f4046e
+# ╟─75b087ff-fb90-4a79-b95b-678157f4046e
 # ╟─c9cb1b8e-bb4a-4f74-9e35-96ad9530413e
 # ╟─9a95c55a-8e44-42d3-a52e-2f18d670811b
 # ╠═ee1d8881-4dce-45d3-95fa-9bb33819ebe9
@@ -2271,26 +2282,26 @@ version = "0.9.1+5"
 # ╠═361bbe46-bf9a-4a6c-834f-5a0660f9a0e6
 # ╠═e0267345-df37-410b-bcca-218e35388f87
 # ╟─17c15ad0-c7b9-4a6e-9375-4bcc1f84a517
-# ╠═246063c6-d2ca-4796-88c5-fa1489e6381b
-# ╠═e14f6526-c5e3-4c17-896e-2983c030f5e9
-# ╠═98508321-fb4b-4076-9c95-0d38f63303b8
-# ╠═8f76c559-ef89-46c0-a792-75a1de96f6e5
+# ╟─246063c6-d2ca-4796-88c5-fa1489e6381b
+# ╟─e14f6526-c5e3-4c17-896e-2983c030f5e9
+# ╟─98508321-fb4b-4076-9c95-0d38f63303b8
+# ╟─8f76c559-ef89-46c0-a792-75a1de96f6e5
 # ╟─f7ad9931-1d92-4d08-a0ee-9393dd524f92
 # ╟─25f7c2a3-a8a7-441e-8da1-b311fd355867
 # ╠═c08308c9-eade-4209-b755-2415542e542a
 # ╟─cffb9e34-c2ab-40c2-8006-e1fd934fd066
-# ╠═d5a447b4-2d22-4466-b89f-de859ed9f09e
-# ╠═22a18398-a6ac-4229-8a52-e984315bb699
-# ╠═c91b9d30-b8e0-457a-a958-2d5f60451b78
-# ╠═9f2ece88-dbc7-495e-9ca5-6518af58caf8
+# ╟─d5a447b4-2d22-4466-b89f-de859ed9f09e
+# ╟─22a18398-a6ac-4229-8a52-e984315bb699
+# ╟─c91b9d30-b8e0-457a-a958-2d5f60451b78
+# ╟─9f2ece88-dbc7-495e-9ca5-6518af58caf8
 # ╟─cc9fb021-35f9-4183-b992-40d82a5c1d2b
 # ╠═325084cb-b233-4a63-8f8c-7ba32b7e8d43
-# ╠═b505808f-6a05-4f2a-b755-201065b9c5f5
-# ╠═7a209d2b-06b8-4177-a728-14a6b7e364ed
-# ╠═dd59eee8-2265-4487-a875-a09aca2d9cb0
+# ╟─b505808f-6a05-4f2a-b755-201065b9c5f5
+# ╟─7a209d2b-06b8-4177-a728-14a6b7e364ed
+# ╟─dd59eee8-2265-4487-a875-a09aca2d9cb0
 # ╟─e552da86-a408-4b3f-a0b6-eb9e9702ddc5
-# ╠═bd6d5348-56e9-45d0-8770-0499d437b0a6
+# ╟─bd6d5348-56e9-45d0-8770-0499d437b0a6
 # ╠═2dbc5948-3c9e-4a93-9919-702fab2a992d
-# ╠═1a9b44b4-415f-47aa-acae-dbef7c9af54a
+# ╟─1a9b44b4-415f-47aa-acae-dbef7c9af54a
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
