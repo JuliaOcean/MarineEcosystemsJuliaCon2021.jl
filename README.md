@@ -36,13 +36,13 @@ The workshop will be organized around tutorials and self-contained Pluto noteboo
 
 - Introduction of the topics covered, presenters, installation, and workshop roadmap (15 minutes).
 
-- [AIBECS.jl](https://github.com/JuliaOcean/AIBECS.jl): concept, implementation, tutorial workthough (30 minutes + 10' for questions)
+- [AIBECS.jl](https://github.com/JuliaOcean/AIBECS.jl): concept, implementation, tutorial workthough (30 minutes + 10' for questions; [this notebook URL](https://raw.githubusercontent.com/JuliaOcean/MarineEcosystemsJuliaCon2021.jl/main/src/AIBECSExample.jl))
 
-- [PlanktonIndividuals.jl](https://github.com/JuliaOcean/PlanktonIndividuals.jl): concept, implementation, tutorial workthough (30 minutes + 10' for questions)
+- [PlanktonIndividuals.jl](https://github.com/JuliaOcean/PlanktonIndividuals.jl): concept, implementation, tutorial workthough (30 minutes + 10' for questions; [this notebook URL](https://raw.githubusercontent.com/JuliaOcean/MarineEcosystemsJuliaCon2021.jl/main/src/PlanktonIndividualExample.jl))
 
-- [ClimateModels.jl](https://github.com/gaelforget/ClimateModels.jl) and [MITgcmTools.jl](https://github.com/gaelforget/MITgcmTools.jl): concept, implementation, tutorial workthough (20 minutes + 10' for questions)
+- [ClimateModels.jl](https://github.com/gaelforget/ClimateModels.jl) and [MITgcmTools.jl](https://github.com/gaelforget/MITgcmTools.jl): concept, implementation, tutorial workthough (20 minutes + 10' for questions; [this notebook URL](https://raw.githubusercontent.com/JuliaOcean/MarineEcosystemsJuliaCon2021.jl/main/src/MITgcm_tutorial_global_oce_biogeo.jl))
 
-- [ClimateModels.jl](https://github.com/gaelforget/ClimateModels.jl) and [IndividualDisplacements.jl](https://github.com/JuliaClimate/IndividualDisplacements.jl): concept, implementation, tutorial workthough (20 minutes + 10' for questions)
+- [ClimateModels.jl](https://github.com/gaelforget/ClimateModels.jl) and [IndividualDisplacements.jl](https://github.com/JuliaClimate/IndividualDisplacements.jl): concept, implementation, tutorial workthough (20 minutes + 10' for questions; [this notebook URL](https://raw.githubusercontent.com/JuliaOcean/MarineEcosystemsJuliaCon2021.jl/main/src/IndividualDisplacementsExample.jl))
 
 - Q&A, tutorials, etc wrap-up
 
