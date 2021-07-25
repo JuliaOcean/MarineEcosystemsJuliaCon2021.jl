@@ -4,325 +4,216 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ f199ba18-ebe7-4d5d-b682-64969ef5ef92
-begin 
-	using MITgcmTools, ClimateModels, PlutoUI, Printf, Plots
-	md"""#### Julia Packages
-    """
+# ╔═╡ 1e3a3928-eccb-11eb-3acb-6f829eeca032
+begin
+	using ShallowWaters, IndividualDisplacements, ClimateModels
+	using Plots, NetCDF, Printf, CSV, DataFrames
+	md"""#### Julia Packages"""
 end
 
-# ╔═╡ 6ef93b0e-859f-11eb-1b3b-d76b26d678dc
+# ╔═╡ 90992888-fd0f-44af-bd61-f5f3d750b34b
 begin
-	md"""# Global Ocean Biogeochemistry Tutorial
+	md"""# Particle Tracking Tutorial
 
 	###
 
-	Here we experiment with [MIT general circulation model (MITgcm)](https://mitgcm.readthedocs.io/en/latest/?badge=latest)'s global ocean biogeochemistry tutorial (`tutorial_global_oce_biogeo`) via the [ClimateModels.jl](https://github.com/gaelforget/ClimateModels.jl) interface as implemented in [MITgcmTools.jl](https://gaelforget.github.io/MITgcmTools.jl/dev/).
+	Here we employ [IndividualDisplacements.jl](https://juliaclimate.github.io/IndividualDisplacements.jl/dev/) (<https://doi.org/10.21105/joss.02813>) to simulate the advection and dispersion of particles by a turbulent flow field computed using [ShallowWaters.jl](https://github.com/milankl/ShallowWaters.jl) based on an [example provided by Milan Klöwer](https://www.milank.de/turbulent-confetti#main).	
 	"""
 end
 
-# ╔═╡ 9aeaf058-d8c1-4e42-b5a7-8038ebf50d5a
-md"""
-!!! note "Model Documentation"
+# ╔═╡ 650ae02b-4f7b-4afe-9f91-676e3ad2ab01
+md"""!!! note "Model Documentation"
 
-	The `tutorial_global_oce_biogeo` model configuration is documented @
-
-	<https://mitgcm.readthedocs.io/en/latest/examples/global_oce_biogeo/global_oce_biogeo.html>
+	As in the global ocean biogeochemistry tutorial, the  [ClimateModels.jl](https://github.com/gaelforget/ClimateModels.jl) interface is used to run this modeling workflow.
 """
 
-# ╔═╡ 42a34a31-4b49-4d0e-81a7-6bde2b1f514d
-md"""
-!!! warning
-    On your first run, the installation of Julia packages and download of MITgcm source code may take a few minutes. 
-
-    Also, [a fortran compiler is required](https://fortran-lang.org/learn/os_setup/install_gfortran) to compile MITgcm. For example, you can follow these [directions to install gfortran](https://fortran-lang.org/learn/os_setup/install_gfortran).
-
-    Aside your local computer, you can try out this notebook in the cloud via [mybinder.org](https://mybinder.org) e.g. using [this link](https://mybinder.org/v2/gh/JuliaOcean/MarineEcosystemsJuliaCon2021.jl/HEAD?urlpath=lab).
-
-	But the **simplest method may be to use JuliaHub.com** which readily provides gfortran.
-"""
-
-# ╔═╡ 7fa8a460-89d4-11eb-19bb-bbacdd32719a
+# ╔═╡ 779730d8-557b-41fd-8b46-907ca744f46a
 md"""## Model Configuration
 
 The model configuration can be summarized like this:	
 """
 
-# ╔═╡ d90039c4-85a1-11eb-0d82-77db4decaa6e
-md"""## Workflow Summary
-
-- the `setup` method will set up the run directory
-- the `build` method will compile the model (MITgcm)
-- the `launch` method will run the model (MITgcm)
-
+# ╔═╡ 5fddbd14-b3c6-4c63-a459-b9ce8a3cab98
+md"""## Model Run
 """
 
-# ╔═╡ 3f58906b-4f50-4df6-84dd-56abe4c9a4c3
+# ╔═╡ b9c1be88-783b-4873-a5f2-f91e415e9032
 md"""## Model Output 
-
-(is found in the `run/` directory)
 """
 
-# ╔═╡ 9d3d6dd1-d2f8-4a87-a89d-0f0752fc22fa
-md"""## Workflow Record
-
-(is found in the `log/` directory)
+# ╔═╡ 72371695-0b7d-4db9-adef-69f71b5a6b05
+md"""## Appendices 
 """
 
-# ╔═╡ cab5152e-3c4b-47ab-937a-f084323267c5
-md"""## Modify And Rerun
+# ╔═╡ 8f8ddaa8-49bf-4d68-a75b-121d39ce0be2
+md"""#### Model (Top Level Function)"""
 
-One cell at a time, for each of the three code cells below : 
+# ╔═╡ 42459023-cbf6-4f66-94a9-4fa0c917d658
+md"""#### Ancillary Functions"""
 
-1) uncomment the function call (e.g. `lock1=rerun1(exps[iexp])`)
-2) run the code cell (i.e. click on the arrow at the bottom right of cell)
-3) wait until the plot has updated (i.e. after model run has finished)
-4) analyze what's happened to the plot and workflow record
-"""
+# ╔═╡ 92f66ca9-e53b-46e0-82c8-86101c96f1bf
+function SWM(m)
+	# Produce some turbulent flows with ShallowWaters.jl
+	nx = m.inputs["nx"]           # parameters
+	ny = m.inputs["ny"]
+	Lx = m.inputs["Lx"]
+	L_ratio = nx/ny
+	dx = Lx/nx
 
-# ╔═╡ 1a9237f4-c1b4-49e1-b3a8-ba7a433cc313
-begin
-	lock1=false
-	#lock1=rerun1(exps[iexp]) #may take O(30sec)
-end
+	# spin up, starting from rest storing u,v,eta in run0000
+	run_model(;nx,Lx,L_ratio,Ndays=100,output=true)    # may take 10min depending on resolution
 
-# ╔═╡ 62bac52e-9f0f-4ee7-9da4-307326f74842
-begin
-	lock2=false
-	#lock2=rerun2(exps[iexp]) #may take O(10min)
-end
-
-# ╔═╡ 6f9c2d22-819b-4001-86cd-b33086a34db6
-begin
-	lock3=false
-	#lock3=rerun3(exps[iexp]) #may take O(10min)
-end
-
-# ╔═╡ c95673c6-7aea-4ce1-b135-91073749ea4c
-md"""## Appendices"""
-
-# ╔═╡ 8cf4d8ca-84eb-11eb-22d2-255ce7237090
-begin
-	#select model configuration
-	exps=verification_experiments()
-	iexp=findall([exps[i].configuration=="tutorial_global_oce_biogeo" for i in 1:length(exps)])[1]
-	myexp=exps[iexp]
-
-	#paths to build and run directories
-	build_path=joinpath(MITgcm_path[1],"verification",myexp.configuration,"build")
-	run_path=joinpath(myexp.folder,string(exps[iexp].ID),"run")
-	log_path=joinpath(myexp.folder,string(exps[iexp].ID),"log")
-	par_path=joinpath(myexp.folder,string(exps[iexp].ID),"log","tracked_parameters")
-	
-	md"""#### Model Configuration"""
-end
-
-# ╔═╡ 1f3096d3-ca68-4a71-9411-fe3b201cf5a9
-myexp
-
-# ╔═╡ 8420675b-1a1b-4f3d-bf81-874ce4813a37
-md"""
-
-The model will compile in a subfolder of `MITgcm` :
-
-*$build_path*
-
-It will run in a temporary folder called :
-
-*$run_path*
-
-And the workflow will be recorded in :
-
-*$log_path*
-
-"""
-
-# ╔═╡ 31829f08-86d1-11eb-3e26-dfae038b4c01
-let
-	setup(myexp)
-	"Setup : 🏁"
-end
-
-# ╔═╡ 848241fe-86d1-11eb-3b30-b94aa0b4431d
-let
-	build(myexp,"--allow-skip")
-	"Build : 🏁"
-end
-
-# ╔═╡ 550d996a-859d-11eb-34bf-717389fbf809
-let
-	launch(myexp)
-	"Launch : 🏁"
-end
-
-# ╔═╡ 0d2237c1-c26c-4f5b-86ca-4682a6ab2d8a
-function rerun3(myexp)
-	# Set up Atmosphere CO2 concentration to already changed climate
-	#  (e.g. dic_pCO2 = 0.000278 for pre-industrial level
-	#   or   dic_pCO2 = 0.00035 for already changed climate)
-
-	fil=joinpath(par_path,"data.dic")
-	nml=read(fil,MITgcm_namelist())
-	nml.params[3][:dic_int1]=1
-	nml.params[3][:dic_pCO2]=0.00035
-	write(fil,nml)
-	git_log_fil(myexp,fil,"update parameter file : "*split(fil,"/")[end])
-
-	# rerun model with updated parameters
-	clean(myexp)
-	setup(myexp)
-	launch(myexp)
-
-	# archive output file
-	fil=joinpath(log_path,"output_run3.txt")
-	cp(joinpath(run_path,"output.txt"),fil)
-	git_log_fil(myexp,fil,"output file from run3")
+	# use previous run as initial condition, and advect tracer with readily turbulent flow
+	run_model(;nx,Lx,L_ratio,Ndays=50,output=true,initial_cond="ncfile")
 
 	return true
 end
 
-# ╔═╡ a4db0102-33fb-49c3-92f7-66dacb9d4e07
-function rerun2(myexp)
-	# change model run duration 
-	#  (e.g. nTimeSteps = 720 for one 360-day year with 1/2 day time step
-	#    or  nTimeSteps = 2160 for three years)
+# ╔═╡ cb2cc51a-cf1d-4369-b00a-c14057e33a61
+function SWM_replay(m)
+	nx = m.inputs["nx"]           # parameters
+	ny = m.inputs["ny"]
+	Lx = m.inputs["Lx"]
+	L_ratio = nx/ny
+	dx = Lx/nx
+	rundir=joinpath(m.folder,string(m.ID))
 
-	fil=joinpath(par_path,"data")
-	nml=read(fil,MITgcm_namelist())
-	nml.params[3][:nTimeSteps] = 2160
-	write(fil,nml)
-	git_log_fil(myexp,fil,"update parameter file : "*split(fil,"/")[end])
+	# reload model output from file, and process for use in IndividualDisplacements.jl
+	ncfile = NetCDF.open(joinpath(rundir,"run0001","u.nc"))
+	u = ncfile.vars["u"][:,:,:]
+	u /= dx                      # normalise m/s to 1/s by division with grid spacing dx
 
-	# rerun model with updated parameters
+	ncfile = NetCDF.open(joinpath(rundir,"run0001","v.nc"))
+	v = zero(u)                  # pad with zeros
+	v[:,2:end,:] .= ncfile.vars["v"][:,:,:]
+	v /= dx                      # normalise
 
-	clean(myexp)
-	setup(myexp)
-	launch(myexp)
+	ncfile = NetCDF.open(joinpath(rundir,"run0001","sst.nc"))
+	sst = ncfile.vars["sst"][:,:,:]
+	t = ncfile.vars["t"][:];      # time
 
-	fil=joinpath(log_path,"output_run2.txt")
-	cp(joinpath(run_path,"output.txt"),fil)
-	git_log_fil(myexp,fil,"output file from run2")
-
-	return true
+	return (u,v,sst,t)
 end
 
-# ╔═╡ db8cc4ec-28a6-4121-a1c0-62701aa4e9f8
-function rerun1(myexp)
-	# output files parameters
-
-	fil=joinpath(par_path,"data")
-	nml=read(fil,MITgcm_namelist())
-
-	nml.params[1][:useSingleCpuIO]=true
-
-	nml.params[3][:pChkptFreq] = 31104000.0
-	nml.params[3][:chkptFreq]  = 31104000.0
-	nml.params[3][:dumpFreq]   = 31104000.0
-	nml.params[3][:taveFreq]   = 31104000.0
-	nml.params[3][:taveFreq]   = 31104000.0
-	nml.params[3][:monitorFreq]= 86400.0
-
-	write(fil,nml)
-	git_log_fil(myexp,fil,"update parameter file : "*split(fil,"/")[end])
-
-	# output files parameters
-
-	fil=joinpath(par_path,"data.diagnostics")
-	nml=read(fil,MITgcm_namelist())
-	nml.params[1][Symbol("frequency(1)")]=2592000.0
-	write(fil,nml)
-	git_log_fil(myexp,fil,"update parameter file : "*split(fil,"/")[end])
-
-	# Set up Atmosphere CO2 concentration to pre-industrial level
-	#  (e.g. dic_pCO2 = 0.000278 for pre-industrial level
-	#   or   dic_pCO2 = 0.00035 for already changed climate)
-
-	fil=joinpath(par_path,"data.dic")
-	nml=read(fil,MITgcm_namelist())
-	nml.params[3][:dic_int1]=1
-	nml.params[3][:dic_pCO2]=0.000278
-	write(fil,nml)
-	git_log_fil(myexp,fil,"update parameter file : "*split(fil,"/")[end])
-
-	# change model run duration 
-	#  (e.g. nTimeSteps = 720 for one 360-day year with 1/2 day time step
-	#    or  nTimeSteps = 2160 for three years)
-
-	fil=joinpath(par_path,"data")
-	nml=read(fil,MITgcm_namelist())
-	nml.params[3][:nTimeSteps] = 120
-	write(fil,nml)
-	git_log_fil(myexp,fil,"update parameter file : "*split(fil,"/")[end])
-
-	# rerun model with updated parameters
-
-	clean(myexp)
-	setup(myexp)
-	launch(myexp)
-
-	fil=joinpath(log_path,"output_run1.txt")
-	cp(joinpath(run_path,"output.txt"),fil)
-	git_log_fil(myexp,fil,"output file from run1")
-
-	return true
-
+# ╔═╡ 0521fadb-fab7-4415-82a6-76a7a68eaaf3
+function update_FlowFields!(F::𝐹_Array2D{T},
+                            u0::AbstractMatrix,
+                            u1::AbstractMatrix,
+                            v0::AbstractMatrix,
+                            v1::AbstractMatrix,
+                            t::AbstractVector) where {T<:Real}
+    
+    @boundscheck size(F.u0) == size(u0) || throw(BoundsError())
+    @boundscheck size(F.u1) == size(u1) || throw(BoundsError())
+    @boundscheck size(F.v0) == size(v0) || throw(BoundsError())
+    @boundscheck size(F.v1) == size(v1) || throw(BoundsError())
+    @boundscheck size(t) == (2,) || throw(BoundsError())
+    
+    # include type conversion if needed
+    F.u0 .= T.(u0)
+    F.u1 .= T.(u1)
+    F.v0 .= T.(v0)
+    F.v1 .= T.(v1)
+    F.𝑇 .= T.(t)     # also reset the time
 end
 
-# ╔═╡ a8263dde-4cde-4da1-8108-0135af254965
-begin
-	lock=lock1*lock2*lock3
-	md"""#### Notebook Synchronization"""
-end
-
-# ╔═╡ a04c1cd6-3b9e-4e69-b986-c863b120bb0b
-begin
-	lock
-	readdir(run_path)
-end
-
-# ╔═╡ d5b00c92-efeb-42ed-9cba-6dd7ffdd4fea
-begin
-	lock
+# ╔═╡ e9a7f9d5-a12b-4a0d-b96c-6b791054c671
+function mymodel(m)
 	
-	filout=joinpath(run_path,"output.txt")
-	filstat=joinpath(run_path,"stat.txt")
-	filfreq=joinpath(run_path,"freq.txt")
+	pth=pwd()
+    cd(joinpath(m.folder,string(m.ID)))
 
+	#1) run ShallowWaters.jl
+	SWM(m)
+	
+	#2) reload output from ShallowWatwers.jl
+	(u,v,sst,t)=SWM_replay(m)
+	nx = m.inputs["nx"]           # parameters
+	ny = m.inputs["ny"]
+	
+	#3) set up IndividualDisplacements.jl
+	nparticles = 500
+	x = nx*0.1 .+ (nx*0.8)*rand(nparticles)    # seed particles a bit away from boundaries
+	y = ny*0.1 .+ (ny*0.8)*rand(nparticles);   # in grid coordinates
+	F = FlowFields(u[:,:,1],u[:,:,2],v[:,:,1],v[:,:,2],eltype(u).(t[1:2]))
+	I = Individuals(F,x,y)
 
-	run(pipeline(`grep trcstat_ptracer01_mean $(filout)`,filstat))
-	tmp0 = read(filstat,String)
-	tmp0 = split(tmp0,"\n")
-	z=[parse(Float64,split(tmp0[i],"=")[2]) for i in 1:length(tmp0)-1]
+	#4) compute trajectories 
+	for i in 2:length(t)
+	    update_FlowFields!(F,u[:,:,i-1],u[:,:,i],v[:,:,i-1],v[:,:,i],t[i-1:i])
+	    ∫!(I)
+	end
+	
+	#5) save IndividualDisplacements.jl output 
+    fil=joinpath(m.folder,string(m.ID),"IndividualPositions.csv")
+    CSV.write(fil, I.🔴)
+	
+    cd(pth)
+	
+    return true
+end
 
-	run(pipeline(`grep "> monitorFreq =" $(filout)`,filfreq))
-	tmp1 = read(filfreq,String)
-	dt=parse(Float64,split(split(tmp1,",")[1],"=")[2])
-	t=[0:length(z)-1]*dt/86400.0
+# ╔═╡ c8d1631a-ffe7-45ac-8223-040dcaa3039f
+begin
+	m=ModelConfig(model=mymodel,inputs=
+		Dict("nx" => 200, "ny" => 100, "Lx" => 2000e3, "nparticles" => 500))
+	setup(m)
+	build(m)
+	m
+end
 
-	plot(t,z,xlabel="day",title="mean ocean carbon (D.I.C.)")
+# ╔═╡ ea325591-a0cc-485d-8be6-4731f71e4a99
+begin
+	launch(m)
+	"done"
+end
+
+# ╔═╡ cc80f696-4661-44d8-a3b2-ae3d86b7cee1
+begin
+	nparticles=m.inputs["nparticles"]
+	fil=joinpath(m.folder,string(m.ID),"IndividualPositions.csv")
+	🔴=DataFrame(CSV.File(fil))
+	(u,v,sst,t)=SWM_replay(m)
+	randcolours = rand(nparticles)
+	
+	function myplot(tstep)
+		id_range = 🔴.t .== t[tstep+1]
+		f=heatmap(sst[:,:,tstep+1]',c=:grays,legend = nothing)
+		scatter!(🔴.x[id_range],🔴.y[id_range],zcolor=randcolours,
+		leg=:none,m = (4, 0.8, :viridis, Plots.stroke(0)))
+		return f
+	end
 	
 end
 
-# ╔═╡ c53396cf-6225-4f17-9d57-613efaf3cd67
+# ╔═╡ 0c1165a8-34b2-4b7d-b3c6-b361865bbf02
 begin
-	lock
-	git_log_show(myexp)
+	anim = @animate for tstep in 0:length(t)-1
+		myplot(tstep)
+	end
+	gif(anim, joinpath(m.folder,string(m.ID),"anim_fps15.gif"), fps = 15)
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 ClimateModels = "f6adb021-9183-4f40-84dc-8cea6f651bb0"
-MITgcmTools = "62725fbc-3a66-4df3-9000-e33e85b3a198"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+IndividualDisplacements = "b92f0c32-5b7e-11e9-1d7b-238b2da8b0e6"
+NetCDF = "30363a11-5582-574a-97bb-aa9a979735b9"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
-PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+ShallowWaters = "56019723-2d87-4a65-81ff-59d5d8913e3c"
 
 [compat]
+CSV = "~0.8.5"
 ClimateModels = "~0.1.9"
-MITgcmTools = "~0.1.23"
+DataFrames = "~1.2.1"
+IndividualDisplacements = "~0.3.2"
+NetCDF = "~0.11.3"
 Plots = "~1.19.3"
-PlutoUI = "~0.7.9"
+ShallowWaters = "~0.5.0"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -344,8 +235,26 @@ version = "3.3.1"
 [[ArgTools]]
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
 
+[[ArnoldiMethod]]
+deps = ["LinearAlgebra", "Random", "StaticArrays"]
+git-tree-sha1 = "f87e559f87a45bece9c9ed97458d3afe98b1ebb9"
+uuid = "ec485272-7323-5ecc-a04f-4719b315124d"
+version = "0.1.0"
+
+[[ArrayInterface]]
+deps = ["IfElse", "LinearAlgebra", "Requires", "SparseArrays", "Static"]
+git-tree-sha1 = "045ff5e1bc8c6fb1ecb28694abba0a0d55b5f4f5"
+uuid = "4fba245c-0d91-5ea0-9b3e-6abc04ee57a9"
+version = "3.1.17"
+
 [[Artifacts]]
 uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
+
+[[AxisAlgorithms]]
+deps = ["LinearAlgebra", "Random", "SparseArrays", "WoodburyMatrices"]
+git-tree-sha1 = "a4d07a1c313392a77042855df46c5f534076fab9"
+uuid = "13072b0f-2c55-5437-9ae7-d433b7a33950"
+version = "1.0.0"
 
 [[Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
@@ -392,6 +301,12 @@ git-tree-sha1 = "23d1f1e10d4e24374112fcf800ac981d14a54b24"
 uuid = "81a5f4ea-a946-549a-aa7e-2a7f63a27d31"
 version = "1.0.0"
 
+[[ChainRulesCore]]
+deps = ["Compat", "LinearAlgebra", "SparseArrays"]
+git-tree-sha1 = "f53ca8d41e4753c41cdafa6ec5f7ce914b34be54"
+uuid = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
+version = "0.10.13"
+
 [[ClimateModels]]
 deps = ["AWS", "CFTime", "CSV", "DataFrames", "Dates", "Downloads", "Git", "NetCDF", "OrderedCollections", "Pkg", "Statistics", "Suppressor", "TOML", "Test", "UUIDs", "Zarr"]
 git-tree-sha1 = "fa9e9c2d60386e01aae380790b9deea2ef8d7570"
@@ -422,6 +337,17 @@ git-tree-sha1 = "417b0ed7b8b838aa6ca0a87aadf1bb9eb111ce40"
 uuid = "5ae59095-9a9b-59fe-a467-6f913c188581"
 version = "0.12.8"
 
+[[CommonSolve]]
+git-tree-sha1 = "68a0743f578349ada8bc911a5cbd5a2ef6ed6d1f"
+uuid = "38540f10-b2f7-11e9-35d8-d573e4eb0ff2"
+version = "0.2.0"
+
+[[CommonSubexpressions]]
+deps = ["MacroTools", "Test"]
+git-tree-sha1 = "7b8a93dba8af7e3b42fecabf646260105ac373f7"
+uuid = "bbf7d656-a473-5ed7-a52c-81e309532950"
+version = "0.3.0"
+
 [[Compat]]
 deps = ["Base64", "Dates", "DelimitedFiles", "Distributed", "InteractiveUtils", "LibGit2", "Libdl", "LinearAlgebra", "Markdown", "Mmap", "Pkg", "Printf", "REPL", "Random", "SHA", "Serialization", "SharedArrays", "Sockets", "SparseArrays", "Statistics", "Test", "UUIDs", "Unicode"]
 git-tree-sha1 = "dc7dedc2c2aa9faf59a55c622760a25cbefbe941"
@@ -448,6 +374,11 @@ version = "0.5.7"
 git-tree-sha1 = "3f71217b538d7aaee0b69ab47d9b7724ca8afa0d"
 uuid = "a8cc5b0e-0ffa-5ad4-8c14-923d3ee1735f"
 version = "4.0.4"
+
+[[CyclicArrays]]
+git-tree-sha1 = "4ab3cb8563aceca605a543a19aacaf09c6781dd3"
+uuid = "6023044f-b3ef-4c22-8399-3ec90a0c9b75"
+version = "0.5.0"
 
 [[DataAPI]]
 git-tree-sha1 = "ee400abb2298bd13bfc3df1c412ed228061a2385"
@@ -479,6 +410,24 @@ uuid = "ade2ca70-3891-5945-98fb-dc099432e06a"
 deps = ["Mmap"]
 uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 
+[[DiffEqBase]]
+deps = ["ArrayInterface", "ChainRulesCore", "DataStructures", "DocStringExtensions", "FastBroadcast", "FunctionWrappers", "IterativeSolvers", "LabelledArrays", "LinearAlgebra", "Logging", "MuladdMacro", "NonlinearSolve", "Parameters", "Printf", "RecursiveArrayTools", "RecursiveFactorization", "Reexport", "Requires", "SciMLBase", "Setfield", "SparseArrays", "StaticArrays", "Statistics", "SuiteSparse", "ZygoteRules"]
+git-tree-sha1 = "932153f62d0508e59733e0fc33361470d293a889"
+uuid = "2b5f629d-d688-5b77-993f-72d75c75574e"
+version = "6.68.1"
+
+[[DiffResults]]
+deps = ["StaticArrays"]
+git-tree-sha1 = "c18e98cba888c6c25d1c3b048e4b3380ca956805"
+uuid = "163ba53b-c6d8-5494-b064-1a9d43ac40c5"
+version = "1.0.3"
+
+[[DiffRules]]
+deps = ["NaNMath", "Random", "SpecialFunctions"]
+git-tree-sha1 = "214c3fcac57755cfda163d91c58893a8723f93e9"
+uuid = "b552c78f-8df3-52c6-915a-8e097449b14b"
+version = "1.0.2"
+
 [[DiskArrays]]
 git-tree-sha1 = "599dc32bae654fa78056b15fed9b2af36f04ee44"
 uuid = "3c3547ce-8d99-4f5e-a174-61eb10b00ae3"
@@ -493,6 +442,12 @@ version = "0.10.3"
 [[Distributed]]
 deps = ["Random", "Serialization", "Sockets"]
 uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
+
+[[DocStringExtensions]]
+deps = ["LibGit2"]
+git-tree-sha1 = "a32185f5428d3986f47c2ab78b1f216d5e6cc96f"
+uuid = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
+version = "0.8.5"
 
 [[Downloads]]
 deps = ["ArgTools", "LibCURL", "NetworkOptions"]
@@ -509,6 +464,12 @@ deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
 git-tree-sha1 = "b3bfd02e98aedfa5cf885665493c5598c350cd2f"
 uuid = "2e619515-83b5-522b-bb60-26c02a35a201"
 version = "2.2.10+0"
+
+[[ExponentialUtilities]]
+deps = ["ArrayInterface", "LinearAlgebra", "Printf", "Requires", "SparseArrays"]
+git-tree-sha1 = "ad435656c49da7615152b856c0f9abe75b0b5dc9"
+uuid = "d4d017d3-3776-5f7e-afef-a10c40355c18"
+version = "1.8.4"
 
 [[ExprTools]]
 git-tree-sha1 = "b7e3d17636b348f005f11040025ae8c6f645fe92"
@@ -533,6 +494,23 @@ git-tree-sha1 = "3cc57ad0a213808473eafef4845a74766242e05f"
 uuid = "b22a6f82-2f65-5046-a5b2-351ab43fb4e5"
 version = "4.3.1+4"
 
+[[FastBroadcast]]
+deps = ["LinearAlgebra"]
+git-tree-sha1 = "26be48918640ce002f5833e8fc537b2ba7ed0234"
+uuid = "7034ab61-46d4-4ed7-9d0f-46aef9175898"
+version = "0.1.8"
+
+[[FastClosures]]
+git-tree-sha1 = "acebe244d53ee1b461970f8910c235b259e772ef"
+uuid = "9aa1b823-49e4-5ca5-8b0f-3971ec8bab6a"
+version = "0.3.2"
+
+[[FiniteDiff]]
+deps = ["ArrayInterface", "LinearAlgebra", "Requires", "SparseArrays", "StaticArrays"]
+git-tree-sha1 = "8b3c09b56acaf3c0e581c66638b85c8650ee9dca"
+uuid = "6a86dc24-6348-571c-b903-95158fe2bd41"
+version = "2.8.1"
+
 [[FixedPointNumbers]]
 deps = ["Statistics"]
 git-tree-sha1 = "335bfdceacc84c5cdf16aadc768aa5ddfc5383cc"
@@ -551,6 +529,17 @@ git-tree-sha1 = "8339d61043228fdd3eb658d86c926cb282ae72a8"
 uuid = "59287772-0a20-5a39-b81b-1366585eb4c0"
 version = "0.4.2"
 
+[[FortranFiles]]
+git-tree-sha1 = "f8cec967f151a65f03afd826650c6e91d8b1da16"
+uuid = "c58ffaec-ab22-586d-bfc5-781a99fd0b10"
+version = "0.6.0"
+
+[[ForwardDiff]]
+deps = ["CommonSubexpressions", "DiffResults", "DiffRules", "LinearAlgebra", "NaNMath", "Printf", "Random", "SpecialFunctions", "StaticArrays"]
+git-tree-sha1 = "e2af66012e08966366a43251e1fd421522908be6"
+uuid = "f6369f11-7733-5829-9624-2563aa707210"
+version = "0.10.18"
+
 [[FreeType2_jll]]
 deps = ["Artifacts", "Bzip2_jll", "JLLWrappers", "Libdl", "Pkg", "Zlib_jll"]
 git-tree-sha1 = "cbd58c9deb1d304f5a245a0b7eb841a2560cfec6"
@@ -562,6 +551,11 @@ deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
 git-tree-sha1 = "aa31987c2ba8704e23c6c8ba8a4f769d5d7e4f91"
 uuid = "559328eb-81f9-559d-9380-de523a88c83c"
 version = "1.0.10+0"
+
+[[FunctionWrappers]]
+git-tree-sha1 = "241552bc2209f0fa068b6415b1942cc0aa486bcc"
+uuid = "069b7b12-0de2-55c6-9aab-29f3d0a68a2e"
+version = "1.1.2"
 
 [[Future]]
 deps = ["Random"]
@@ -638,6 +632,34 @@ git-tree-sha1 = "c6a1fff2fd4b1da29d3dccaffb1e1001244d844e"
 uuid = "cd3eb016-35fb-5094-929b-558a96fad6f3"
 version = "0.9.12"
 
+[[Hwloc]]
+deps = ["Hwloc_jll"]
+git-tree-sha1 = "92d99146066c5c6888d5a3abc871e6a214388b91"
+uuid = "0e44f5e4-bd66-52a0-8798-143a42290a1d"
+version = "2.0.0"
+
+[[Hwloc_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
+git-tree-sha1 = "3395d4d4aeb3c9d31f5929d32760d8baeee88aaf"
+uuid = "e33a78d0-f292-5ffc-b300-72abe9b543c8"
+version = "2.5.0+0"
+
+[[IfElse]]
+git-tree-sha1 = "28e837ff3e7a6c3cdb252ce49fb412c8eb3caeef"
+uuid = "615f187c-cbe4-4ef1-ba3b-2fcf58d6d173"
+version = "0.1.0"
+
+[[IndividualDisplacements]]
+deps = ["CFTime", "CSV", "CyclicArrays", "DataFrames", "Dates", "MITgcmTools", "MeshArrays", "NetCDF", "OceanStateEstimation", "OrdinaryDiffEq", "Pkg", "Random", "UnPack"]
+git-tree-sha1 = "9ed924aa20af7b021de752aac4b3c14b91eafc12"
+uuid = "b92f0c32-5b7e-11e9-1d7b-238b2da8b0e6"
+version = "0.3.2"
+
+[[Inflate]]
+git-tree-sha1 = "f5fc07d4e706b84f72d54eedcc1c13d92fb0871c"
+uuid = "d25df0c9-e2be-5dd7-82c8-3ad0b3e990b9"
+version = "0.1.2"
+
 [[IniFile]]
 deps = ["Test"]
 git-tree-sha1 = "098e4d2c533924c921f9f9847274f2ad89e018b8"
@@ -647,6 +669,12 @@ version = "0.5.0"
 [[InteractiveUtils]]
 deps = ["Markdown"]
 uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
+
+[[Interpolations]]
+deps = ["AxisAlgorithms", "ChainRulesCore", "LinearAlgebra", "OffsetArrays", "Random", "Ratios", "Requires", "SharedArrays", "SparseArrays", "StaticArrays", "WoodburyMatrices"]
+git-tree-sha1 = "1470c80592cf1f0a35566ee5e93c5f8221ebc33a"
+uuid = "a98d9a8b-a2ab-59e6-89dd-64a1c18fca59"
+version = "0.13.3"
 
 [[InvertedIndices]]
 deps = ["Test"]
@@ -658,6 +686,12 @@ version = "1.0.0"
 git-tree-sha1 = "05110a2ab1fc5f932622ffea2a003221f4782c18"
 uuid = "c8e1da08-722c-5040-9ed9-7db0dc04731e"
 version = "1.3.0"
+
+[[IterativeSolvers]]
+deps = ["LinearAlgebra", "Printf", "Random", "RecipesBase", "SparseArrays"]
+git-tree-sha1 = "1a8c6237e78b714e901e406c096fc8a65528af7d"
+uuid = "42fd0dbc-a981-5370-80f2-aaf504508153"
+version = "0.9.1"
 
 [[IteratorInterfaceExtensions]]
 git-tree-sha1 = "a3f24677c21f5bbe9d2a714f95dcd58337fb2856"
@@ -698,6 +732,12 @@ version = "2.10.1+0"
 git-tree-sha1 = "c7f1c695e06c01b95a67f0cd1d34994f3e7db104"
 uuid = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
 version = "1.2.1"
+
+[[LabelledArrays]]
+deps = ["ArrayInterface", "LinearAlgebra", "MacroTools", "StaticArrays"]
+git-tree-sha1 = "5e38cfdd771c34821ade5515f782fe00865d60b3"
+uuid = "2ee39098-c373-598a-b85f-a56591580800"
+version = "1.6.2"
 
 [[Latexify]]
 deps = ["Formatting", "InteractiveUtils", "LaTeXStrings", "MacroTools", "Markdown", "Printf", "Requires"]
@@ -778,12 +818,36 @@ git-tree-sha1 = "7f3efec06033682db852f8b3bc3c1d2b0a0ab066"
 uuid = "38a345b3-de98-5d2b-a5d3-14cd9215e700"
 version = "2.36.0+0"
 
+[[LightGraphs]]
+deps = ["ArnoldiMethod", "DataStructures", "Distributed", "Inflate", "LinearAlgebra", "Random", "SharedArrays", "SimpleTraits", "SparseArrays", "Statistics"]
+git-tree-sha1 = "432428df5f360964040ed60418dd5601ecd240b6"
+uuid = "093fc24a-ae57-5d10-9952-331d41423f4d"
+version = "1.3.5"
+
+[[LineSearches]]
+deps = ["LinearAlgebra", "NLSolversBase", "NaNMath", "Parameters", "Printf"]
+git-tree-sha1 = "f27132e551e959b3667d8c93eae90973225032dd"
+uuid = "d3d80556-e9d4-5f37-9878-2ab0fcc64255"
+version = "7.1.1"
+
 [[LinearAlgebra]]
 deps = ["Libdl"]
 uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 
+[[LogExpFunctions]]
+deps = ["DocStringExtensions", "LinearAlgebra"]
+git-tree-sha1 = "7bd5f6565d80b6bf753738d2bc40a5dfea072070"
+uuid = "2ab3a3ac-af41-5b50-aa03-7779005ae688"
+version = "0.2.5"
+
 [[Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
+
+[[LoopVectorization]]
+deps = ["ArrayInterface", "DocStringExtensions", "IfElse", "LinearAlgebra", "OffsetArrays", "Polyester", "Requires", "SLEEFPirates", "Static", "StrideArraysCore", "ThreadingUtilities", "UnPack", "VectorizationBase"]
+git-tree-sha1 = "06c91d5495c32bca6b843551a1331c3cd2fb23d0"
+uuid = "bdcacae8-1622-11e9-2a5c-532679323890"
+version = "0.12.53"
 
 [[Lz4_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -802,6 +866,11 @@ deps = ["Markdown", "Random"]
 git-tree-sha1 = "6a8a2a625ab0dea913aba95c11370589e0239ff0"
 uuid = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
 version = "0.5.6"
+
+[[ManualMemory]]
+git-tree-sha1 = "71c64ebe61a12bad0911f8fc4f91df8a448c604c"
+uuid = "d125e4d3-2237-4719-b19c-fa641b8a4667"
+version = "0.1.4"
 
 [[Markdown]]
 deps = ["Base64"]
@@ -846,6 +915,23 @@ version = "0.7.1"
 [[MozillaCACerts_jll]]
 uuid = "14a3606d-f60d-562e-9121-12d972cd8159"
 
+[[MuladdMacro]]
+git-tree-sha1 = "c6190f9a7fc5d9d5915ab29f2134421b12d24a68"
+uuid = "46d2c3a1-f734-5fdb-9937-b9b9aeba4221"
+version = "0.2.2"
+
+[[NLSolversBase]]
+deps = ["DiffResults", "Distributed", "FiniteDiff", "ForwardDiff"]
+git-tree-sha1 = "50608f411a1e178e0129eab4110bd56efd08816f"
+uuid = "d41bc354-129a-5804-8e4c-c37616107c6c"
+version = "7.8.0"
+
+[[NLsolve]]
+deps = ["Distances", "LineSearches", "LinearAlgebra", "NLSolversBase", "Printf", "Reexport"]
+git-tree-sha1 = "019f12e9a1a7880459d0173c182e6a99365d7ac1"
+uuid = "2774e3e8-f4cf-5e23-947b-6d7e65073b56"
+version = "4.5.1"
+
 [[NaNMath]]
 git-tree-sha1 = "bfe47e760d60b82b66b61d2d44128b62e3a369fb"
 uuid = "77ba4419-2d1f-58cd-9bb1-8ffee604a2e3"
@@ -872,6 +958,18 @@ version = "400.702.400+0"
 [[NetworkOptions]]
 uuid = "ca575930-c2e3-43a9-ace4-1e988b2c1908"
 
+[[NonlinearSolve]]
+deps = ["ArrayInterface", "FiniteDiff", "ForwardDiff", "IterativeSolvers", "LinearAlgebra", "RecursiveArrayTools", "RecursiveFactorization", "Reexport", "SciMLBase", "Setfield", "StaticArrays", "UnPack"]
+git-tree-sha1 = "ef18e47df4f3917af35be5e5d7f5d97e8a83b0ec"
+uuid = "8913a72c-1f9b-4ce2-8d82-65094dcecaec"
+version = "0.3.8"
+
+[[OceanStateEstimation]]
+deps = ["Downloads", "FortranFiles", "MITgcmTools", "MeshArrays", "Pkg", "Statistics"]
+git-tree-sha1 = "1b0fc64e4a8ef28225a2dc718e02455fbaaf8ce9"
+uuid = "891f6deb-a4f5-4bc5-a2e3-1e8f649cdd2c"
+version = "0.1.9"
+
 [[OffsetArrays]]
 deps = ["Adapt"]
 git-tree-sha1 = "4f825c6da64aebaa22cc058ecfceed1ab9af1c7e"
@@ -890,6 +988,12 @@ git-tree-sha1 = "15003dcb7d8db3c6c857fda14891a539a8f2705a"
 uuid = "458c3c95-2e84-50aa-8efc-19380b2a3a95"
 version = "1.1.10+0"
 
+[[OpenSpecFun_jll]]
+deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl", "Pkg"]
+git-tree-sha1 = "13652491f6856acfd2db29360e1bbcd4565d04f1"
+uuid = "efe28fd5-8261-553b-a9e1-b2916fc3738e"
+version = "0.5.5+0"
+
 [[Opus_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
 git-tree-sha1 = "51a08fb14ec28da2ec7a927c4337e4332c2a4720"
@@ -901,6 +1005,12 @@ git-tree-sha1 = "85f8e6578bf1f9ee0d11e7bb1b1456435479d47c"
 uuid = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
 version = "1.4.1"
 
+[[OrdinaryDiffEq]]
+deps = ["Adapt", "ArrayInterface", "DataStructures", "DiffEqBase", "DocStringExtensions", "ExponentialUtilities", "FastClosures", "FiniteDiff", "ForwardDiff", "LinearAlgebra", "Logging", "MacroTools", "MuladdMacro", "NLsolve", "Polyester", "RecursiveArrayTools", "Reexport", "SparseArrays", "SparseDiffTools", "StaticArrays", "UnPack"]
+git-tree-sha1 = "379ed10814cba5087978bce9df31161a496620d3"
+uuid = "1dea7af3-3e70-54e6-95c3-0bf5283fa5ed"
+version = "5.60.1"
+
 [[PCRE2_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "efcefdf7-47ab-520b-bdef-62a2eaa19f15"
@@ -910,6 +1020,12 @@ deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
 git-tree-sha1 = "b2a7af664e098055a7529ad1a900ded962bca488"
 uuid = "2f80f16e-611a-54ab-bc61-aa92de5b98fc"
 version = "8.44.0+0"
+
+[[Parameters]]
+deps = ["OrderedCollections", "UnPack"]
+git-tree-sha1 = "2276ac65f1e236e0a6ea70baff3f62ad4c625345"
+uuid = "d96e819e-fc66-5662-9728-84c9c7592b0a"
+version = "0.12.2"
 
 [[Parsers]]
 deps = ["Dates"]
@@ -945,11 +1061,11 @@ git-tree-sha1 = "1bbbb5670223d48e124b388dee62477480e23234"
 uuid = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 version = "1.19.3"
 
-[[PlutoUI]]
-deps = ["Base64", "Dates", "InteractiveUtils", "JSON", "Logging", "Markdown", "Random", "Reexport", "Suppressor"]
-git-tree-sha1 = "44e225d5837e2a2345e69a1d1e01ac2443ff9fcb"
-uuid = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
-version = "0.7.9"
+[[Polyester]]
+deps = ["ArrayInterface", "IfElse", "ManualMemory", "Requires", "Static", "StrideArraysCore", "ThreadingUtilities", "VectorizationBase"]
+git-tree-sha1 = "f5a74523ebc205723baefb95874f708741199d70"
+uuid = "f517fe37-dbe3-4b94-8317-1923a5111588"
+version = "0.3.4"
 
 [[PooledArrays]]
 deps = ["DataAPI", "Future"]
@@ -987,6 +1103,11 @@ uuid = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
 deps = ["Serialization"]
 uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
+[[Ratios]]
+git-tree-sha1 = "37d210f612d70f3f7d57d488cb3b6eff56ad4e41"
+uuid = "c84ed2f1-dad5-54f0-aa8e-dbefe2724439"
+version = "0.4.0"
+
 [[RecipesBase]]
 git-tree-sha1 = "b3fb709f3c97bfc6e948be68beeecb55a0b340ae"
 uuid = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
@@ -997,6 +1118,18 @@ deps = ["Dates", "NaNMath", "PlotUtils", "RecipesBase"]
 git-tree-sha1 = "2a7a2469ed5d94a98dea0e85c46fa653d76be0cd"
 uuid = "01d81517-befc-4cb6-b9ec-a95719d0359c"
 version = "0.3.4"
+
+[[RecursiveArrayTools]]
+deps = ["ArrayInterface", "ChainRulesCore", "DocStringExtensions", "LinearAlgebra", "RecipesBase", "Requires", "StaticArrays", "Statistics", "ZygoteRules"]
+git-tree-sha1 = "e64c9777fcd2d9859e1a685ffba36d1b2abf3ea7"
+uuid = "731186ca-8d62-57ce-b412-fbd966d074cd"
+version = "2.15.0"
+
+[[RecursiveFactorization]]
+deps = ["LinearAlgebra", "LoopVectorization"]
+git-tree-sha1 = "2e1a88c083ebe8ba69bc0b0084d4b4ba4aa35ae0"
+uuid = "f2c3362d-daeb-58d1-803e-2bc74f2840b4"
+version = "0.1.13"
 
 [[Reexport]]
 git-tree-sha1 = "5f6c21241f0f655da3952fd60aa18477cf96c220"
@@ -1017,6 +1150,18 @@ version = "0.4.1"
 [[SHA]]
 uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
 
+[[SLEEFPirates]]
+deps = ["IfElse", "Static", "VectorizationBase"]
+git-tree-sha1 = "da6d214ffc85b1292f300649ef86d3c4f9aaf25d"
+uuid = "476501e8-09a2-5ece-8869-fb82de89a1fa"
+version = "0.6.22"
+
+[[SciMLBase]]
+deps = ["ArrayInterface", "CommonSolve", "ConstructionBase", "Distributed", "DocStringExtensions", "IteratorInterfaceExtensions", "LinearAlgebra", "Logging", "RecipesBase", "RecursiveArrayTools", "StaticArrays", "Statistics", "Tables", "TreeViews"]
+git-tree-sha1 = "f0bf114650476709dd04e690ab2e36d88368955e"
+uuid = "0bca4576-84f4-4d90-8ffe-ffa030f20462"
+version = "1.18.2"
+
 [[Scratch]]
 deps = ["Dates"]
 git-tree-sha1 = "0b4b7f1393cff97c33891da2a0bf69c6ed241fda"
@@ -1032,6 +1177,18 @@ version = "1.3.5"
 [[Serialization]]
 uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
 
+[[Setfield]]
+deps = ["ConstructionBase", "Future", "MacroTools", "Requires"]
+git-tree-sha1 = "d5640fc570fb1b6c54512f0bd3853866bd298b3e"
+uuid = "efcf1570-3423-57d1-acb7-fd33fddbac46"
+version = "0.7.0"
+
+[[ShallowWaters]]
+deps = ["Dates", "Interpolations", "NetCDF", "Parameters", "Printf"]
+git-tree-sha1 = "d4f6acebbf11c5dda6c4c9036f21dc934ea4aad9"
+uuid = "56019723-2d87-4a65-81ff-59d5d8913e3c"
+version = "0.5.0"
+
 [[SharedArrays]]
 deps = ["Distributed", "Mmap", "Random", "Serialization"]
 uuid = "1a1011a3-84de-559e-8e89-a11a2f7dc383"
@@ -1041,6 +1198,12 @@ deps = ["Dates", "Grisu"]
 git-tree-sha1 = "91eddf657aca81df9ae6ceb20b959ae5653ad1de"
 uuid = "992d4aef-0814-514b-bc4d-f2e9a6c4116f"
 version = "1.0.3"
+
+[[SimpleTraits]]
+deps = ["InteractiveUtils", "MacroTools"]
+git-tree-sha1 = "5d7e3f4e11935503d3ecaf7186eac40602e7d231"
+uuid = "699a6c99-e7fa-54fc-8d76-47d257e15c1d"
+version = "0.9.4"
 
 [[Sockets]]
 uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
@@ -1060,6 +1223,24 @@ version = "1.0.1"
 [[SparseArrays]]
 deps = ["LinearAlgebra", "Random"]
 uuid = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
+
+[[SparseDiffTools]]
+deps = ["Adapt", "ArrayInterface", "Compat", "DataStructures", "FiniteDiff", "ForwardDiff", "LightGraphs", "LinearAlgebra", "Requires", "SparseArrays", "StaticArrays", "VertexSafeGraphs"]
+git-tree-sha1 = "bdaa461dbfebb839b740f4582e8728f0f92ca375"
+uuid = "47a9eef4-7e08-11e9-0b38-333d64bd3804"
+version = "1.15.0"
+
+[[SpecialFunctions]]
+deps = ["ChainRulesCore", "LogExpFunctions", "OpenSpecFun_jll"]
+git-tree-sha1 = "a50550fa3164a8c46747e62063b4d774ac1bcf49"
+uuid = "276daf66-3868-5448-9aa4-cd146d93841b"
+version = "1.5.1"
+
+[[Static]]
+deps = ["IfElse"]
+git-tree-sha1 = "2740ea27b66a41f9d213561a04573da5d3823d4b"
+uuid = "aedffcd0-7271-4cad-89d0-dc628f76c6d3"
+version = "0.2.5"
 
 [[StaticArrays]]
 deps = ["LinearAlgebra", "Random", "Statistics"]
@@ -1082,11 +1263,21 @@ git-tree-sha1 = "2f6792d523d7448bbe2fec99eca9218f06cc746d"
 uuid = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 version = "0.33.8"
 
+[[StrideArraysCore]]
+deps = ["ArrayInterface", "ManualMemory", "Requires", "ThreadingUtilities", "VectorizationBase"]
+git-tree-sha1 = "2525850b6887e217c3cc149ab29eb2a7a6360d37"
+uuid = "7792a7ef-975c-4747-a70f-980b88e8d1da"
+version = "0.1.16"
+
 [[StructArrays]]
 deps = ["Adapt", "DataAPI", "StaticArrays", "Tables"]
 git-tree-sha1 = "000e168f5cc9aded17b6999a560b7c11dda69095"
 uuid = "09ab397b-f2b6-538f-b94a-2f83cf4a842a"
 version = "0.6.0"
+
+[[SuiteSparse]]
+deps = ["Libdl", "LinearAlgebra", "Serialization", "SparseArrays"]
+uuid = "4607b0f0-06f3-5cda-b6b1-a6196a1729e9"
 
 [[Suppressor]]
 git-tree-sha1 = "a819d77f31f83e5792a76081eee1ea6342ab8787"
@@ -1117,11 +1308,23 @@ uuid = "a4e569a6-e804-4fa4-b0f3-eef7a1d5b13e"
 deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]
 uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
+[[ThreadingUtilities]]
+deps = ["ManualMemory"]
+git-tree-sha1 = "593009385e6536dc50baedc2c8bc1a3717ef358f"
+uuid = "8290d209-cae3-49c0-8002-c8c24d57dab5"
+version = "0.4.5"
+
 [[TranscodingStreams]]
 deps = ["Random", "Test"]
 git-tree-sha1 = "7c53c35547de1c5b9d46a4797cf6d8253807108c"
 uuid = "3bb67fe8-82b1-5028-8e26-92a6c54297fa"
 version = "0.9.5"
+
+[[TreeViews]]
+deps = ["Test"]
+git-tree-sha1 = "8d0d7a3fe2f30d6a7f833a5f19f7c7a5b396eae6"
+uuid = "a2a6695c-b41b-5b7d-aed9-dbfdeacea5d7"
+version = "0.3.0"
 
 [[URIs]]
 git-tree-sha1 = "97bbe755a53fe859669cd907f2d96aee8d2c1355"
@@ -1132,6 +1335,11 @@ version = "1.3.0"
 deps = ["Random", "SHA"]
 uuid = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
 
+[[UnPack]]
+git-tree-sha1 = "387c1f73762231e86e0c9c5443ce3b4a0a9a0c2b"
+uuid = "3a884ed6-31ef-47d7-9d2a-63182c4928ed"
+version = "1.0.2"
+
 [[Unicode]]
 uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 
@@ -1140,6 +1348,18 @@ deps = ["ConstructionBase", "Dates", "LinearAlgebra", "Random"]
 git-tree-sha1 = "a981a8ef8714cba2fd9780b22fd7a469e7aaf56d"
 uuid = "1986cc42-f94f-5a68-af5c-568840ba703d"
 version = "1.9.0"
+
+[[VectorizationBase]]
+deps = ["ArrayInterface", "Hwloc", "IfElse", "Libdl", "LinearAlgebra", "Static"]
+git-tree-sha1 = "ddeac5d8aad03c17bdc8efd45246e82fc52d12f4"
+uuid = "3d5dd08c-fd9d-11e8-17fa-ed2836048c2f"
+version = "0.20.24"
+
+[[VertexSafeGraphs]]
+deps = ["LightGraphs"]
+git-tree-sha1 = "b9b450c99a3ca1cc1c6836f560d8d887bcbe356e"
+uuid = "19fa3120-7c27-5ec5-8db8-b0b0aa330d6f"
+version = "0.1.2"
 
 [[Wayland_jll]]
 deps = ["Artifacts", "Expat_jll", "JLLWrappers", "Libdl", "Libffi_jll", "Pkg", "XML2_jll"]
@@ -1152,6 +1372,12 @@ deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Wayland_jll"]
 git-tree-sha1 = "2839f1c1296940218e35df0bbb220f2a79686670"
 uuid = "2381bf8a-dfd0-557d-9999-79630e7b1b91"
 version = "1.18.0+4"
+
+[[WoodburyMatrices]]
+deps = ["LinearAlgebra", "SparseArrays"]
+git-tree-sha1 = "59e2ad8fd1591ea019a5259bd012d7aee15f995c"
+uuid = "efce3f68-66dc-5838-9240-27a6d6f5f9b6"
+version = "0.5.3"
 
 [[XML2_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Libiconv_jll", "Pkg", "Zlib_jll"]
@@ -1313,6 +1539,12 @@ git-tree-sha1 = "cc4bf3fdde8b7e3e9fa0351bdeedba1cf3b7f6e6"
 uuid = "3161d3a3-bdf6-5164-811a-617609db77b4"
 version = "1.5.0+0"
 
+[[ZygoteRules]]
+deps = ["MacroTools"]
+git-tree-sha1 = "9e7a1e8ca60b742e508a315c17eef5211e7fbfd7"
+uuid = "700de1a5-db45-46bc-99cf-38207098b444"
+version = "0.2.1"
+
 [[libass_jll]]
 deps = ["Artifacts", "Bzip2_jll", "FreeType2_jll", "FriBidi_jll", "JLLWrappers", "Libdl", "Pkg", "Zlib_jll"]
 git-tree-sha1 = "acc685bcf777b2202a904cdcb49ad34c2fa1880c"
@@ -1371,31 +1603,22 @@ version = "0.9.1+5"
 """
 
 # ╔═╡ Cell order:
-# ╟─6ef93b0e-859f-11eb-1b3b-d76b26d678dc
-# ╟─9aeaf058-d8c1-4e42-b5a7-8038ebf50d5a
-# ╟─42a34a31-4b49-4d0e-81a7-6bde2b1f514d
-# ╟─7fa8a460-89d4-11eb-19bb-bbacdd32719a
-# ╟─1f3096d3-ca68-4a71-9411-fe3b201cf5a9
-# ╟─8420675b-1a1b-4f3d-bf81-874ce4813a37
-# ╟─d90039c4-85a1-11eb-0d82-77db4decaa6e
-# ╟─31829f08-86d1-11eb-3e26-dfae038b4c01
-# ╟─848241fe-86d1-11eb-3b30-b94aa0b4431d
-# ╟─550d996a-859d-11eb-34bf-717389fbf809
-# ╟─3f58906b-4f50-4df6-84dd-56abe4c9a4c3
-# ╟─a04c1cd6-3b9e-4e69-b986-c863b120bb0b
-# ╟─d5b00c92-efeb-42ed-9cba-6dd7ffdd4fea
-# ╟─9d3d6dd1-d2f8-4a87-a89d-0f0752fc22fa
-# ╟─c53396cf-6225-4f17-9d57-613efaf3cd67
-# ╟─cab5152e-3c4b-47ab-937a-f084323267c5
-# ╟─1a9237f4-c1b4-49e1-b3a8-ba7a433cc313
-# ╟─62bac52e-9f0f-4ee7-9da4-307326f74842
-# ╟─6f9c2d22-819b-4001-86cd-b33086a34db6
-# ╟─c95673c6-7aea-4ce1-b135-91073749ea4c
-# ╟─f199ba18-ebe7-4d5d-b682-64969ef5ef92
-# ╟─8cf4d8ca-84eb-11eb-22d2-255ce7237090
-# ╟─0d2237c1-c26c-4f5b-86ca-4682a6ab2d8a
-# ╟─a4db0102-33fb-49c3-92f7-66dacb9d4e07
-# ╟─db8cc4ec-28a6-4121-a1c0-62701aa4e9f8
-# ╟─a8263dde-4cde-4da1-8108-0135af254965
+# ╟─90992888-fd0f-44af-bd61-f5f3d750b34b
+# ╟─650ae02b-4f7b-4afe-9f91-676e3ad2ab01
+# ╟─779730d8-557b-41fd-8b46-907ca744f46a
+# ╟─c8d1631a-ffe7-45ac-8223-040dcaa3039f
+# ╟─5fddbd14-b3c6-4c63-a459-b9ce8a3cab98
+# ╟─ea325591-a0cc-485d-8be6-4731f71e4a99
+# ╟─b9c1be88-783b-4873-a5f2-f91e415e9032
+# ╟─0c1165a8-34b2-4b7d-b3c6-b361865bbf02
+# ╟─72371695-0b7d-4db9-adef-69f71b5a6b05
+# ╟─1e3a3928-eccb-11eb-3acb-6f829eeca032
+# ╟─8f8ddaa8-49bf-4d68-a75b-121d39ce0be2
+# ╟─e9a7f9d5-a12b-4a0d-b96c-6b791054c671
+# ╟─42459023-cbf6-4f66-94a9-4fa0c917d658
+# ╟─92f66ca9-e53b-46e0-82c8-86101c96f1bf
+# ╟─cb2cc51a-cf1d-4369-b00a-c14057e33a61
+# ╟─0521fadb-fab7-4415-82a6-76a7a68eaaf3
+# ╟─cc80f696-4661-44d8-a3b2-ae3d86b7cee1
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
