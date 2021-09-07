@@ -4,13 +4,13 @@
 
 **Speakers:** [Gael Forget](https://github.com/gaelforget), [Benoit Pasquier](https://github.com/briochemc), [Zhen Wu](https://github.com/zhenwu0728)
 
-## Will stream on youtube at 2pm UTC on Sunday 2021/07/25
+## 2021/07/25 Workshop Recording
 
 streaming : https://www.youtube.com/watch?v=UCIRrXz2ZS0
 
 webpage : https://pretalx.com/juliacon2021/talk/FEZW9Q/
 
-<img src="https://user-images.githubusercontent.com/20276764/126787920-fb0fc858-366e-44cb-822b-6ceb8aa814fa.png" width="90%">
+[<img src="https://user-images.githubusercontent.com/20276764/132381907-1ab7d682-ea3d-4db7-b245-3cdb9dd2dcd3.png" width="75%">](https://www.youtube.com/watch?v=UCIRrXz2ZS0)
 
 ## Abstract
 
@@ -46,9 +46,7 @@ The workshop will be organized around tutorials and self-contained Pluto noteboo
 
 - Q&A, tutorials, etc wrap-up
 
-Workshop materials will be made available ahead of time @ https://github.com/JuliaOcean/MarineEcosystemsJuliaCon2021.jl
-
-
+Workshop materials are available ahead of time @ https://github.com/JuliaOcean/MarineEcosystemsJuliaCon2021.jl
 
 
 
