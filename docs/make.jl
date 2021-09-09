@@ -17,6 +17,7 @@ for i in lst
     fil_out=joinpath(pth,i[1:end-2]*"html")
     PlutoSliderServer.export_notebook(fil_in)
     mv(fil_in[1:end-2]*"html",fil_out)
+    cp(fil_in,fil_out[1:end-4]*"jl")
 end
 
 deploydocs(;
