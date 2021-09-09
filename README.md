@@ -16,11 +16,6 @@ webpage : https://pretalx.com/juliacon2021/talk/FEZW9Q/
 
 Life in the oceans is strongly connected to our climate. In this workshop, you will learn to use packages from the [JuliaOcean](https://github.com/JuliaOcean) and [JuliaClimate](https://github.com/JuliaClimate) organizations that provide a foundation for studying marine ecosystems across a wide range of scales. We will run agent-based models to explore individual microbes and processes that drive species interactions. On the other end of the model hierarchy, we will simulate planetary-scale transports that control ocean biogeography and climate change.
 
-
-
-
-
-
 ## Description
 
 Packages covered in this workshop will include:
@@ -30,7 +25,7 @@ Packages covered in this workshop will include:
 - [MITgcmTools.jl](https://github.com/gaelforget/MITgcmTools.jl): interface to full-featured, Fortran-based, general circulation model and its output (transports, chemistry, ecology, ocean, sea-ice, atmosphere, and more).
 - [IndividualDisplacements.jl](https://github.com/JuliaClimate/IndividualDisplacements.jl): local to global particle tracking, for simulating dispersion, connectivity, transports in the ocean or atmosphere, etc.
 
-The workshop will be organized around tutorials and self-contained Pluto notebooks for the different packages.
+The workshop was organized around tutorials and self-contained Pluto notebooks for the different packages.
 
 ## Schedule
 
@@ -55,11 +50,11 @@ Workshop materials are available ahead of time @ https://github.com/JuliaOcean/M
 
 To run the notebooks of this workshop on your machine, you need to:
 
-1. **Install Julia** from <https://julialang.org/> (latest version is v1.6.2).
+1. **Install Julia** from <https://julialang.org/> (latest version is v1.6.2)
 
-1. **Start Julia.**
+1. **Start Julia**
 
-1. **Add the Pluto package (v0.15.0 or later).**
+1. **Add Pluto.jl** (v0.15.0 or later)**
 
     This is simply done by typing, in the julia REPL,
 
