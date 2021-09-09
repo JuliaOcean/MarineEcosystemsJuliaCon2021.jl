@@ -8,11 +8,11 @@
 
 ## 2021/07/25 Workshop Recording
 
-streaming : https://www.youtube.com/watch?v=UCIRrXz2ZS0
+streaming : <https://www.youtube.com/watch?v=UCIRrXz2ZS0>
 
-webpage : https://pretalx.com/juliacon2021/talk/FEZW9Q/
+webpage : <https://pretalx.com/juliacon2021/talk/FEZW9Q/>
 
-[<img src="https://user-images.githubusercontent.com/20276764/132381907-1ab7d682-ea3d-4db7-b245-3cdb9dd2dcd3.png" width="75%">](https://www.youtube.com/watch?v=UCIRrXz2ZS0)
+[![video link](https://user-images.githubusercontent.com/20276764/132381907-1ab7d682-ea3d-4db7-b245-3cdb9dd2dcd3.png)](https://www.youtube.com/watch?v=UCIRrXz2ZS0)
 
 ## Abstract
 
@@ -20,7 +20,9 @@ Life in the oceans is strongly connected to our climate. In this workshop, you w
 
 ## Notebooks
 
-Any example found in the online documentation is most easily run using [Pluto.jl](https://github.com/fonsp/Pluto.jl). Just copy the corresponding `notebook url` link below and paste into the [Pluto.jl interface](https://github.com/fonsp/Pluto.jl/wiki/🔎-Basic-Commands-in-Pluto).
+Any example found in the online documentation is most easily run using [Pluto.jl](https://github.com/fonsp/Pluto.jl) . 
+
+Just copy the corresponding `notebook url` link below and paste into the [Pluto.jl interface](https://github.com/fonsp/Pluto.jl/wiki/🔎-Basic-Commands-in-Pluto) (v0.15 or later).
 
 - [AIBECSExample.html](AIBECSExample.html) (---> [notebook url](AIBECSExample.jl))
 - [PlanktonIndividualExample.html](PlanktonIndividualExample.html) (---> [notebook url](PlanktonIndividualExample.jl))
