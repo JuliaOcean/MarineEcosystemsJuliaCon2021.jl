@@ -22,4 +22,5 @@ end
 
 deploydocs(;
     repo="github.com/JuliaOcean/MarineEcosystemsJuliaCon2021.jl",
+    devbranch = "main",
 )
