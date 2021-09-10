@@ -79,4 +79,3 @@ To run the notebooks of this workshop on your machine, you need to:
     Pluto.run(notebook="https://raw.githubusercontent.com/JuliaOcean/MarineEcosystemsJuliaCon2021.jl/main/src/AIBECSExample.jl")
     ```
 **Alternatively**, instead of your own computer, you can just launch a Pluto instance in the cloud using [JuliaHub.com](https://juliahub.com/ui/Home), paste a notebook URL in the [Pluto start page](https://github.com/fonsp/Pluto.jl), and click open.
-
