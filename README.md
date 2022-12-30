@@ -24,7 +24,7 @@ Any example found in the online documentation is most easily run using [Pluto.jl
 
 Just copy the corresponding `notebook url` link below and paste into the [Pluto.jl interface](https://github.com/fonsp/Pluto.jl/wiki/🔎-Basic-Commands-in-Pluto) (v0.15 or later).
 
-- [AIBECSExample.html](https://juliaocean.github.io/MarineEcosystemsJuliaCon2021.jl/dev/AIBECSExample.html) (---> [notebook url](AIBECSExample.jl))
+- [AIBECSExample.html](https://juliaocean.github.io/MarineEcosystemsJuliaCon2021.jl/dev/AIBECSExample.html) (---> [notebook url](https://juliaocean.github.io/MarineEcosystemsJuliaCon2021.jl/dev/AIBECSExample.jl))
 - [PlanktonIndividualExample.html](https://juliaocean.github.io/MarineEcosystemsJuliaCon2021.jl/dev/PlanktonIndividualExample.html) (---> [notebook url](https://juliaocean.github.io/MarineEcosystemsJuliaCon2021.jl/dev/PlanktonIndividualExample.jl))
 - [MITgcm_tutorial_global_oce_biogeo.html](https://juliaocean.github.io/MarineEcosystemsJuliaCon2021.jl/dev/MITgcm_tutorial_global_oce_biogeo.html) (---> [notebook url](https://juliaocean.github.io/MarineEcosystemsJuliaCon2021.jl/dev/MITgcm_tutorial_global_oce_biogeo.jl))
 - [IndividualDisplacementsExample.html](https://juliaocean.github.io/MarineEcosystemsJuliaCon2021.jl/dev/IndividualDisplacementsExample.html) (---> [notebook url](https://juliaocean.github.io/MarineEcosystemsJuliaCon2021.jl/dev/IndividualDisplacementsExample.jl))
