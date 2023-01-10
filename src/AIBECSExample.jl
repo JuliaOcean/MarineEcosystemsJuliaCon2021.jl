@@ -60,8 +60,8 @@ Deviations of ¹⁴C concentrations away from atmoshperic values serve as a trac
 
 We call this mean time the "radiocarbon age", and we are going to calculate it!
 
-![](https://wserv4.esc.cam.ac.uk/pastclimate/wp-content/uploads/2014/09/Radiocarbon-cycle_2-e1410282981969.jpg)
-*image taken from [a "Past Oceans and Climate" blog post by Luke Skinner](https://wserv4.esc.cam.ac.uk/pastclimate/?page_id=19)*
+![](https://user-images.githubusercontent.com/4486578/211448037-f4936ebf-a98b-4d2d-aea7-212083f30dbe.png)
+*image retrieved 26 May 202 from [a "Past Oceans and Climate" blog post by Luke Skinner](https://wserv4.esc.cam.ac.uk/pastclimate/?page_id=19) (the URL may not be valid anymore)*
 """
 
 # ╔═╡ 1d84e220-7bca-489b-83d8-87fe26398435
